@@ -546,6 +546,11 @@
                     Dernière synchro : <span id="lastSync">—</span>
                 </div>
             </div>
+            <div class="card" style="margin-top:10px">
+                <div style="font-size:0.82rem;font-weight:700;margin-bottom:10px">📄 Backup TXT</div>
+                <div id="backupTxt" style="background:var(--gl);padding:10px;border-radius:8px;font-size:0.72rem;font-family:monospace;white-space:pre-wrap;max-height:300px;overflow-y:auto"></div>
+                <button class="btn btn-sm btn-out" style="margin-top:10px;width:100%" onclick="dlBackupTxt()">📥 Télécharger le backup TXT</button>
+            </div>
         </div>
     </div>
 </div>
@@ -1149,6 +1154,7 @@ function promptAdmin(){
     if(pin===ADMIN_PIN){
         area.style.display='block';
         document.getElementById('adminToken').textContent=GH_TOKEN?GH_TOKEN.substring(0,20)+'••••••••':'Non configuré';
+        renderBackupTxt();
     }else if(pin!==null){
         toast('Code incorrect','err');
     }
@@ -1162,6 +1168,50 @@ function editToken(){
         localStorage.setItem('loc_gh_token',encoded);
         toast('Token mis à jour — rechargez l\'appli','ok');
     }
+}
+
+// ===== BACKUP TXT =====
+function genBackupTxt(){
+    const now=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    let txt=`LOCATIONS — Sauvegarde du ${now}\n\n`;
+    ['sp','pn'].forEach(pid=>{
+        const p=D.properties[pid];
+        txt+=`═══ ${p.name.toUpperCase()} ═══\n`;
+        if(p.wifi)txt+=`WiFi : ${p.wifi}\n`;
+        if(p.keyBox)txt+=`Boîte à clés : ${p.keyBox}\n`;
+        txt+='\n';
+        const rs=[...D.reservations].filter(r=>r.property===pid).sort((a,b)=>pd(a.startDate)-pd(b.startDate));
+        if(!rs.length){txt+='  Aucune réservation\n\n';return;}
+        rs.forEach((r,i)=>{
+            const d=dys(r.startDate,r.endDate);
+            txt+=`${i+1}. ${r.guestName} — ${fd(r.startDate)} → ${fd(r.endDate)} (${d}j)\n`;
+            txt+=`   ${r.persons} pers. — ${r.platform} — Ménage : ${r.cleaning||'—'}`;
+            if(r.amount)txt+=` — ${r.amount}€`;
+            if(r.notes)txt+=`\n   Notes : ${r.notes}`;
+            txt+='\n';
+        });
+        txt+='\n';
+    });
+    // Contacts
+    txt+='═══ CONTACTS ═══\n';
+    for(const[k,c]of Object.entries(CT)){
+        txt+=`${c.name} (${c.role}) : ${c.phone||'pas de numéro'}\n`;
+    }
+    return txt;
+}
+function renderBackupTxt(){
+    const el=document.getElementById('backupTxt');
+    if(el)el.textContent=genBackupTxt();
+}
+function dlBackupTxt(){
+    const txt=genBackupTxt();
+    const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`locations-backup-${new Date().toISOString().slice(0,10)}.txt`;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    toast('Backup téléchargé','ok');
 }
 
 // ===== EXPORTS =====
