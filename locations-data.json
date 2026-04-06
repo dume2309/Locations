@@ -284,19 +284,6 @@
       "cleaning": "",
       "notes": "",
       "createdAt": "2026-01-01T00:00:00.000Z"
-    },
-    {
-      "property": "sp",
-      "platform": "AIRBNB",
-      "guestName": "Essai a supprimer",
-      "startDate": "2026-04-22",
-      "endDate": "2026-04-26",
-      "persons": 1,
-      "amount": 5689,
-      "cleaning": "Laetitia",
-      "notes": "",
-      "id": "mnnnvpfrqffwj",
-      "createdAt": "2026-04-06T20:47:16.359Z"
     }
   ],
   "version": 1,
@@ -310,7 +297,7 @@
     "steph": {
       "name": "Steph",
       "role": "Propriétaire",
-      "phone": "",
+      "phone": "0616928334",
       "color": "#059669"
     },
     "bea": {
