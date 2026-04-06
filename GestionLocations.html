@@ -204,9 +204,9 @@
         .cd.today { background: var(--blue-bg); }
         .cd .dn { font-weight: 700; font-size: 0.72rem; margin-bottom: 1px; }
         .cd.today .dn { color: var(--blue); }
-        .cb { display: block; padding: 1px 3px; border-radius: 3px; font-size: 0.58rem; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
-        .cb.sp { background: var(--green-bg); color: var(--green); }
-        .cb.pn { background: var(--orange-bg); color: var(--orange); }
+        .cb { display: block; padding: 2px 4px; border-radius: 3px; font-size: 0.6rem; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700; border-left: 3px solid; }
+        .cb.sp { background: var(--green-bg); color: var(--green); border-left-color: var(--green); }
+        .cb.pn { background: var(--orange-bg); color: var(--orange); border-left-color: var(--orange); }
 
         /* ===== CODES ===== */
         .code-card { border-radius: var(--r); padding: 16px; margin-bottom: 12px; color: white; }
@@ -412,7 +412,10 @@
     <div style="padding-top:14px">
         <div class="cal-nav">
             <button class="cal-btn" onclick="cMov(-1)">◀</button>
-            <span class="cal-title" id="cTitle"></span>
+            <div style="text-align:center">
+                <span class="cal-title" id="cTitle"></span><br>
+                <button class="btn btn-sm btn-out" style="margin-top:4px;font-size:0.72rem;padding:4px 12px" onclick="initCalMonth();renderCal()">Réservations</button>
+            </div>
             <button class="cal-btn" onclick="cMov(1)">▶</button>
         </div>
         <div class="filters" style="justify-content:center;margin-bottom:10px">
@@ -534,7 +537,19 @@ const SK='loc_v3', CK='loc_ct_v1';
 const INIT={"properties":{"sp":{"name":"Santu Pietru","wifi":"","keyBox":""},"pn":{"name":"Pietranera","wifi":"","keyBox":""}},"reservations":[{"id":"excel_sp_1","property":"sp","platform":"HOMEREZ","guestName":"L-Dufour","startDate":"2025-03-27","endDate":"2025-03-30","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_2","property":"sp","platform":"HOMEREZ","guestName":"A-Foivard","startDate":"2025-04-04","endDate":"2025-04-11","persons":10,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_3","property":"sp","platform":"AIRBNB","guestName":"M-Freyssinet","startDate":"2025-04-12","endDate":"2025-04-13","persons":10,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_4","property":"sp","platform":"AIRBNB","guestName":"I M OLIVIER","startDate":"2025-04-17","endDate":"2025-04-18","persons":7,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_5","property":"sp","platform":"HOMEREZ","guestName":"C-Mendes","startDate":"2025-04-18","endDate":"2025-04-25","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_6","property":"sp","platform":"AIRBNB","guestName":"A C POLETTI","startDate":"2025-04-27","endDate":"2025-04-30","persons":6,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_7","property":"sp","platform":"AIRBNB","guestName":"T-blanchot","startDate":"2025-05-23","endDate":"2025-05-24","persons":6,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_8","property":"sp","platform":"HOMEREZ","guestName":"M-Celegato","startDate":"2025-06-17","endDate":"2025-06-27","persons":8,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_9","property":"sp","platform":"AIRBNB","guestName":"S-Halm","startDate":"2025-07-13","endDate":"2025-07-19","persons":8,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_10","property":"sp","platform":"AIRBNB","guestName":"D-Quiles","startDate":"2025-07-20","endDate":"2025-07-28","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_11","property":"sp","platform":"AIRBNB","guestName":"H Larbernede","startDate":"2025-07-29","endDate":"2025-08-01","persons":8,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_12","property":"sp","platform":"AIRBNB","guestName":"N Vigroux","startDate":"2025-08-01","endDate":"2025-08-06","persons":8,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_13","property":"sp","platform":"AIRBNB","guestName":"C-Froger","startDate":"2025-08-06","endDate":"2025-08-11","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_14","property":"sp","platform":"AIRBNB","guestName":"D R FIRENZE","startDate":"2025-08-11","endDate":"2025-08-15","persons":7,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_15","property":"sp","platform":"HOMEREZ","guestName":"C-Guillonneau","startDate":"2025-08-15","endDate":"2025-08-22","persons":10,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_16","property":"sp","platform":"AIRBNB","guestName":"G-L'Epinoy","startDate":"2025-08-23","endDate":"2025-08-27","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_17","property":"sp","platform":"AIRBNB","guestName":"C Payet","startDate":"2025-09-25","endDate":"2025-09-28","persons":5,"amount":0,"cleaning":"","notes":""},{"id":"excel_pn_18","property":"pn","platform":"AIRBNB","guestName":"V Avudenez","startDate":"2025-04-24","endDate":"2025-04-25","persons":4,"amount":0,"cleaning":"","notes":""},{"id":"excel_pn_19","property":"pn","platform":"AIRBNB","guestName":"J Rutin","startDate":"2025-07-16","endDate":"2025-07-18","persons":4,"amount":0,"cleaning":"","notes":""},{"id":"excel_pn_20","property":"pn","platform":"PULSE","guestName":"M-Plachtova","startDate":"2025-06-29","endDate":"2025-07-09","persons":2,"amount":1366.9,"cleaning":"","notes":""},{"id":"excel_pn_21","property":"pn","platform":"PULSE","guestName":"F-Nardone","startDate":"2025-08-06","endDate":"2025-08-11","persons":5,"amount":796.25,"cleaning":"","notes":""}],"version":1};
 const DEF_CT={laetitia:{name:'Laetitia',role:'Femme de ménage',phone:'',color:'#7c3aed'},steph:{name:'Steph',role:'Propriétaire',phone:'',color:'#059669'},bea:{name:'Bea',role:'Propriétaire',phone:'',color:'#d97706'}};
 
-let D,CT,cM=new Date().getMonth(),cY=new Date().getFullYear(),cf='all',rf='all',dirty=false;
+let D,CT,cM,cY,cf='all',rf='all',dirty=false;
+
+function initCalMonth(){
+    // Start on current month if it has reservations, otherwise first month with data
+    const now=new Date();cM=now.getMonth();cY=now.getFullYear();
+    const curHas=D.reservations.some(r=>{const s=pd(r.startDate),e=pd(r.endDate);const ms=new Date(cY,cM,1),me=new Date(cY,cM+1,0,23,59);return s<=me&&e>=ms;});
+    if(!curHas&&D.reservations.length){
+        // Find first future reservation, or most recent
+        const sorted=[...D.reservations].sort((a,b)=>pd(a.startDate)-pd(b.startDate));
+        const future=sorted.find(r=>pd(r.endDate)>=now)||sorted[sorted.length-1];
+        const d=pd(future.startDate);cM=d.getMonth();cY=d.getFullYear();
+    }
+}
 
 function ld(){try{const r=localStorage.getItem(SK);if(r){D=JSON.parse(r);if(D.reservations)return;}}catch(e){}D=JSON.parse(JSON.stringify(INIT));localStorage.setItem(SK,JSON.stringify(D));}
 function ldC(){try{const r=localStorage.getItem(CK);if(r){CT=JSON.parse(r);return;}}catch(e){}CT=JSON.parse(JSON.stringify(DEF_CT));localStorage.setItem(CK,JSON.stringify(CT));}
@@ -899,7 +914,7 @@ window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.return
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
 
 // ===== INIT =====
-ld();ldC();refresh();
+ld();ldC();initCalMonth();refresh();
 </script>
 </body>
 </html>
