@@ -40,18 +40,19 @@
             padding-bottom: var(--safe-b);
         }
         .tab-bar button {
-            flex: 1; border: none; background: none; padding: 6px 0 4px;
-            display: flex; flex-direction: column; align-items: center; gap: 1px;
-            font-size: 0.62rem; color: var(--g); cursor: pointer; font-weight: 500;
-            transition: color 0.15s;
+            flex: 1; border: none; background: none; padding: 10px 0 8px;
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            font-size: 0.75rem; color: var(--g); cursor: pointer; font-weight: 600;
+            transition: color 0.15s; letter-spacing: 0.2px;
         }
         .tab-bar button.on { color: var(--blue); }
-        .tab-bar .ti { font-size: 1.4rem; height: 28px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .tab-bar button.on .ti { transform: scale(1.1); }
+        .tab-bar .ti { font-size: 1.6rem; height: 32px; display: flex; align-items: center; justify-content: center; position: relative; transition: transform 0.15s; }
         .tab-bar .badge {
-            position: absolute; top: -2px; right: -8px;
-            background: var(--red); color: white; font-size: 0.6rem; font-weight: 700;
-            min-width: 16px; height: 16px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center; padding: 0 4px;
+            position: absolute; top: -2px; right: -10px;
+            background: var(--red); color: white; font-size: 0.65rem; font-weight: 700;
+            min-width: 18px; height: 18px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center; padding: 0 5px;
         }
 
         /* ===== TOP BAR ===== */
@@ -329,24 +330,48 @@
             .qstats { grid-template-columns: repeat(2, 1fr); }
             .prop-card { min-height: 90px; }
         }
-        /* iPad portrait */
+        /* iPad portrait + tablette */
         @media (min-width: 768px) {
-            .pg { padding: 0 24px 100px; }
+            .pg { padding: 0 28px 110px; }
             .prop-cards { gap: 14px; }
-            .prop-card { min-height: 140px; padding: 20px; }
-            .prop-card .pc-status { font-size: 1.3rem; }
-            .qstats { grid-template-columns: repeat(4, 1fr); gap: 12px; }
-            .qs-n { font-size: 1.6rem; }
-            .cd { min-height: 72px; }
-            .cb { font-size: 0.65rem; }
-            .rc { padding: 16px; }
+            .prop-card { min-height: 150px; padding: 22px; }
+            .prop-card .pc-name { font-size: 0.95rem; }
+            .prop-card .pc-status { font-size: 1.4rem; }
+            .prop-card .pc-detail { font-size: 0.82rem; }
+            .qstats { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+            .qs { padding: 16px 10px; }
+            .qs-n { font-size: 1.8rem; }
+            .qs-l { font-size: 0.75rem; }
+            .cd { min-height: 80px; padding: 5px; }
+            .cd .dn { font-size: 0.82rem; }
+            .cb { font-size: 0.7rem; }
+            .ch { font-size: 0.78rem; padding: 10px 2px; }
+            .rc { padding: 18px; }
+            .rc-name { font-size: 1.05rem; }
+            .rc-dates { font-size: 0.88rem; }
+            .tag { font-size: 0.75rem; padding: 4px 12px; }
+            .sec-title { font-size: 0.88rem; }
+            .tl-item { padding: 16px 18px; }
+            .tl-title { font-size: 1rem; }
+            .tl-sub { font-size: 0.85rem; }
+            .mini-cal-title { font-size: 1rem; }
+            .mc-d { font-size: 0.82rem; padding: 7px 2px; }
             .sheet { max-width: 500px; border-radius: 16px; margin-bottom: 10vh; }
+            .tab-bar { padding-top: 4px; }
+            .tab-bar button { padding: 12px 0 10px; font-size: 0.85rem; gap: 4px; }
+            .tab-bar .ti { font-size: 1.8rem; height: 36px; }
+            .top h1 { font-size: 1.3rem; }
+            .top { padding: 16px 24px 14px; }
+            .top-btn { width: 40px; height: 40px; font-size: 1.15rem; }
+            .btn { padding: 14px 24px; font-size: 0.95rem; }
+            .fd input, .fd select, .fd textarea { padding: 13px 16px; font-size: 0.95rem; }
         }
         /* iPad landscape / desktop */
         @media (min-width: 1024px) {
+            .pg { max-width: 1100px; }
             .prop-cards { grid-template-columns: 1fr 1fr; }
-            .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
-            .tab-bar { left: auto; right: auto; max-width: 400px; left: 50%; transform: translateX(-50%); border-radius: 16px 16px 0 0; }
+            .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+            .tab-bar { left: 50%; transform: translateX(-50%); max-width: 480px; border-radius: 16px 16px 0 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.08); }
         }
     </style>
 </head>
