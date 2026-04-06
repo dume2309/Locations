@@ -1,0 +1,51 @@
+📱 Appli Locations — Santu Pietru & Pietranera
+
+Salut ! Voici l'appli pour gérer les locations :
+
+👉 https://dume2309.github.io/Locations/GestionLocations.html
+
+
+Pour l'installer sur iPhone/iPad (comme une vraie appli) :
+
+1. Ouvre le lien ci-dessus dans Safari (pas Chrome !)
+2. Tape sur le bouton Partager (le carré avec la flèche en bas de l'écran)
+3. Descends et tape "Sur l'écran d'accueil"
+4. Tape "Ajouter"
+5. L'icône "Locations" apparaît sur ton écran d'accueil !
+
+
+Comment ça marche :
+
+🏠 Accueil = vue rapide : qui arrive bientôt, les ménages à prévoir, le mini-calendrier
+
+📋 Réservations = liste complète, tu peux filtrer par propriété (Santu Pietru / Pietranera)
+
+📅 Calendrier = vue mois par mois avec les réservations en couleur (vert = Santu Pietru, orange = Pietranera)
+
+⚙️ Réglages = codes WiFi, boîte à clés, contacts (Laetitia, Steph, Bea)
+
+
+Pour ajouter/modifier une réservation :
+
+- Tape le + en haut à droite pour en ajouter une nouvelle
+- Tape sur une réservation existante pour voir le détail, puis "Modifier"
+
+
+Ménage & SMS Laetitia :
+
+- Dans une réservation, choisis qui fait le ménage (Laetitia, Steph, Bea...)
+- Si c'est Laetitia → un bouton SMS et WhatsApp apparaît pour lui envoyer le message directement
+- Un rappel calendrier se crée automatiquement la veille à 9h pour ne pas oublier !
+
+
+Codes WiFi & clés :
+
+- Va dans Réglages pour voir/copier les codes
+- Tu peux les envoyer direct par WhatsApp ou SMS au locataire
+
+
+💾 Sauvegarde : les données sont sur ton téléphone. Pense à sauvegarder de temps en temps dans Réglages → Sauvegarder (JSON).
+
+Le guide complet est dans l'appli : Réglages → Guide d'utilisation
+
+Bises !

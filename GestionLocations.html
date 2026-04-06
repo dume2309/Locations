@@ -461,6 +461,75 @@
             <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="expCSV()">📊 Export Excel (CSV)</button>
             <button class="btn btn-out btn-full" onclick="window.print()">🖨️ Imprimer</button>
         </div>
+
+        <div class="sec-title">❓ Guide d'utilisation</div>
+        <div class="card" id="helpArea" style="font-size:0.85rem;line-height:1.6">
+            <div style="font-weight:800;font-size:1rem;margin-bottom:12px">Comment utiliser l'appli</div>
+
+            <div style="font-weight:700;color:var(--blue);margin-top:14px">📲 Installer sur iPhone / iPad</div>
+            <div style="padding:8px 0 4px;color:var(--g);font-size:0.82rem">
+                1. Ouvrir le lien dans <b>Safari</b> (pas Chrome)<br>
+                2. Taper sur <b>Partager</b> (carré avec flèche ↑ en bas)<br>
+                3. Choisir <b>"Sur l'écran d'accueil"</b><br>
+                4. Taper <b>"Ajouter"</b><br>
+                → L'icône <b>Locations</b> apparaît comme une vraie appli !
+            </div>
+
+            <div style="font-weight:700;color:var(--blue);margin-top:14px">🏠 Accueil</div>
+            <div style="padding:8px 0 4px;color:var(--g);font-size:0.82rem">
+                Vue rapide : qui arrive bientôt, les ménages à prévoir, mini-calendrier.<br>
+                Les arrivées et départs des 10 prochains jours s'affichent automatiquement.
+            </div>
+
+            <div style="font-weight:700;color:var(--blue);margin-top:14px">📋 Réservations</div>
+            <div style="padding:8px 0 4px;color:var(--g);font-size:0.82rem">
+                Liste complète de toutes les réservations.<br>
+                Filtrer par propriété avec les boutons en haut.<br>
+                Taper sur une réservation pour voir le détail.
+            </div>
+
+            <div style="font-weight:700;color:var(--blue);margin-top:14px">➕ Ajouter / Modifier</div>
+            <div style="padding:8px 0 4px;color:var(--g);font-size:0.82rem">
+                <b>Ajouter :</b> bouton <b>+</b> en haut à droite<br>
+                <b>Modifier :</b> taper sur une réservation → Détail → <b>Modifier</b><br>
+                Remplir : propriété, plateforme, nom, dates, personnes, ménage.
+            </div>
+
+            <div style="font-weight:700;color:var(--blue);margin-top:14px">🧹 Ménage & SMS Laetitia</div>
+            <div style="padding:8px 0 4px;color:var(--g);font-size:0.82rem">
+                Dans une réservation, choisir qui fait le ménage (Laetitia, Steph, Bea…)<br>
+                Si c'est <b>Laetitia</b> → un bouton <b>SMS</b> et <b>WhatsApp</b> apparaît pour lui envoyer le message directement.<br>
+                Il suffit de taper le bouton et d'envoyer !
+            </div>
+
+            <div style="font-weight:700;color:var(--blue);margin-top:14px">🔔 Rappels automatiques</div>
+            <div style="padding:8px 0 4px;color:var(--g);font-size:0.82rem">
+                Quand vous assignez un ménage, l'appli propose d'ajouter un <b>rappel au calendrier</b> du téléphone.<br>
+                Le rappel sonne la <b>veille à 9h</b> pour ne pas oublier d'envoyer le SMS.<br>
+                Taper <b>"Ouvrir"</b> puis <b>"Ajouter"</b> quand le fichier se télécharge.
+            </div>
+
+            <div style="font-weight:700;color:var(--blue);margin-top:14px">🔑 Codes WiFi & clés</div>
+            <div style="padding:8px 0 4px;color:var(--g);font-size:0.82rem">
+                Dans <b>Réglages</b> → Codes d'accès.<br>
+                Copier ou envoyer les codes directement par <b>WhatsApp</b> ou <b>SMS</b> au locataire.
+            </div>
+
+            <div style="font-weight:700;color:var(--blue);margin-top:14px">📅 Calendrier</div>
+            <div style="padding:8px 0 4px;color:var(--g);font-size:0.82rem">
+                Vue mois par mois.<br>
+                <span style="color:var(--green)">■</span> Vert = Santu Pietru &nbsp;
+                <span style="color:var(--orange)">■</span> Orange = Pietranera<br>
+                Taper sur un jour pour voir la réservation.
+            </div>
+
+            <div style="font-weight:700;color:var(--blue);margin-top:14px">💾 Sauvegarde</div>
+            <div style="padding:8px 0 4px;color:var(--g);font-size:0.82rem">
+                Les données sont stockées sur le téléphone.<br>
+                Pensez à <b>Sauvegarder (JSON)</b> régulièrement pour avoir une copie de secours.<br>
+                Pour synchroniser entre 2 appareils : exporter sur l'un, importer sur l'autre.
+            </div>
+        </div>
     </div>
 </div>
 
@@ -796,6 +865,55 @@ function smsLae(id){
     else{cpTxt(msg);toast('Message copié — ajoutez le n° dans Réglages','ok');}
 }
 
+// ===== RAPPEL CALENDRIER (.ics) =====
+function addReminder(id){
+    const r=D.reservations.find(x=>x.id===id);if(!r)return;
+    const prop=pnm(r.property);
+    const who=r.cleaning||'équipe';
+    const summary=`Prévenir ${who} — ménage ${prop}`;
+    const desc=`Ménage avant arrivée de ${r.guestName} (${r.persons} pers.)\\n${prop} — ${r.platform}\\nPenser à envoyer le SMS !`;
+    // Veille du check-in à 9h
+    const s=pd(r.startDate);
+    s.setDate(s.getDate()-1);
+    const dtStart=icsDate(s,9,0);
+    const dtEnd=icsDate(s,9,30);
+    const now=icsDate(new Date());
+    const uid=r.id+'@locations';
+    const ics=[
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Locations//FR',
+        'CALSCALE:GREGORIAN',
+        'BEGIN:VEVENT',
+        'UID:'+uid,
+        'DTSTAMP:'+now,
+        'DTSTART:'+dtStart,
+        'DTEND:'+dtEnd,
+        'SUMMARY:'+summary,
+        'DESCRIPTION:'+desc,
+        'BEGIN:VALARM',
+        'TRIGGER:-PT0M',
+        'ACTION:DISPLAY',
+        'DESCRIPTION:'+summary,
+        'END:VALARM',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ].join('\r\n');
+    const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=`rappel_${r.guestName.replace(/\s+/g,'_')}.ics`;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Rappel téléchargé — ouvrez-le pour l\'ajouter au calendrier','ok');
+}
+function icsDate(d,h,m){
+    const dt=new Date(d);
+    if(h!==undefined){dt.setHours(h,m||0,0,0);}
+    const p=n=>String(n).padStart(2,'0');
+    return dt.getFullYear()+p(dt.getMonth()+1)+p(dt.getDate())+'T'+p(dt.getHours())+p(dt.getMinutes())+'00';
+}
+
 // ===== FORM =====
 function openForm(id){
     if(id){
@@ -829,9 +947,22 @@ function saveR(){
     if(pd(e)<=pd(s)){toast('Départ doit être après arrivée','err');return;}
     const data={property:document.getElementById('fProp').value,platform:document.getElementById('fPlat').value,guestName:n,startDate:s,endDate:e,persons:parseInt(document.getElementById('fPers').value)||1,amount:parseFloat(document.getElementById('fAmt').value)||0,cleaning:document.getElementById('fClean').value,notes:document.getElementById('fNotes').value.trim()};
     const eid=document.getElementById('fId').value;
-    if(eid){const i=D.reservations.findIndex(r=>r.id===eid);if(i>=0){D.reservations[i]={...D.reservations[i],...data};toast('Modifié','ok');}}
-    else{data.id=uid();data.createdAt=new Date().toISOString();D.reservations.push(data);toast('Ajouté','ok');}
+    let savedId;
+    if(eid){const i=D.reservations.findIndex(r=>r.id===eid);if(i>=0){D.reservations[i]={...D.reservations[i],...data};savedId=eid;toast('Modifié','ok');}}
+    else{data.id=uid();data.createdAt=new Date().toISOString();D.reservations.push(data);savedId=data.id;toast('Ajouté','ok');}
     sv();closeSheet('shForm');
+    // Auto-rappel si ménage assigné et arrivée dans le futur
+    if(data.cleaning && pd(data.startDate)>new Date()){
+        const reminded=getReminded();
+        if(!reminded.includes(savedId)){
+            setTimeout(()=>{
+                if(confirm(`Ajouter un rappel au calendrier pour le ménage de ${data.cleaning} ?\n(Veille de l'arrivée de ${n})`)){
+                    addReminder(savedId);
+                    setReminded([...reminded,savedId]);
+                }
+            },400);
+        }
+    }
 }
 function delR(){
     const id=document.getElementById('fId').value,r=D.reservations.find(x=>x.id===id);
@@ -929,8 +1060,25 @@ window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.return
 // ===== SERVICE WORKER (PWA) =====
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
 
+// ===== RAPPELS AUTO =====
+const RK='loc_reminded'; // IDs des réservations dont le rappel a été créé
+function getReminded(){try{return JSON.parse(localStorage.getItem(RK)||'[]');}catch(e){return [];}}
+function setReminded(ids){localStorage.setItem(RK,JSON.stringify(ids));}
+function checkPendingReminders(){
+    const reminded=getReminded();
+    const now=new Date();
+    const pending=D.reservations.filter(r=>r.cleaning && pd(r.startDate)>now && !reminded.includes(r.id));
+    if(!pending.length)return;
+    const names=pending.map(r=>`• ${r.guestName} (${pnm(r.property)}, ménage ${r.cleaning})`).join('\n');
+    if(confirm(`${pending.length} réservation${pending.length>1?'s':''} sans rappel calendrier :\n\n${names}\n\nAjouter les rappels au calendrier ?`)){
+        pending.forEach((r,i)=>{setTimeout(()=>addReminder(r.id),i*500);});
+        setReminded([...reminded,...pending.map(r=>r.id)]);
+    }
+}
+
 // ===== INIT =====
 ld();ldC();initCalMonth();refresh();
+setTimeout(checkPendingReminders,1500);
 </script>
 </body>
 </html>
