@@ -132,15 +132,15 @@
         .mc-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 1px; }
         .mc-hd { text-align: center; font-size: 0.6rem; font-weight: 600; color: var(--g); padding: 4px 0; }
         .mc-d {
-            text-align: center; padding: 5px 2px; font-size: 0.72rem; border-radius: 6px;
-            position: relative; cursor: pointer;
+            text-align: center; padding: 6px 2px; font-size: 0.78rem; border-radius: 8px;
+            position: relative; cursor: pointer; font-weight: 500;
         }
-        .mc-d.today { background: var(--blue); color: white; font-weight: 700; border-radius: 50%; }
+        .mc-d.today { background: var(--blue); color: white; font-weight: 700; }
         .mc-d.empty { visibility: hidden; }
-        .mc-d .mc-dots { display: flex; justify-content: center; gap: 2px; margin-top: 1px; }
-        .mc-d .mc-dot { width: 4px; height: 4px; border-radius: 50%; }
-        .mc-d .mc-dot.sp { background: var(--green); }
-        .mc-d .mc-dot.pn { background: var(--orange); }
+        .mc-d.has-sp { background: var(--green-bg); color: var(--green); font-weight: 700; }
+        .mc-d.has-pn { background: var(--orange-bg); color: var(--orange); font-weight: 700; }
+        .mc-d.has-both { background: linear-gradient(135deg, var(--green-bg) 50%, var(--orange-bg) 50%); font-weight: 700; }
+        .mc-d.today.has-sp, .mc-d.today.has-pn, .mc-d.today.has-both { outline: 3px solid var(--blue); outline-offset: -1px; }
 
         /* ===== QUICK STATS ===== */
         .qstats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
@@ -662,8 +662,8 @@ function renderHome(){
 
 function renderMiniCal(){
     const now=new Date(),m=now.getMonth(),y=now.getFullYear();
-    const MN=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
-    const DN=['L','M','M','J','V','S','D'];
+    const MN=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+    const DN=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
     const dim=new Date(y,m+1,0).getDate();
     let s=new Date(y,m,1).getDay()-1;if(s<0)s=6;
     let h=`<div class="mini-cal-head"><span class="mini-cal-title">${MN[m]} ${y}</span></div>`;
@@ -675,14 +675,12 @@ function renderMiniCal(){
         const isT=now.getDate()===d;
         const rs=D.reservations.filter(r=>inR(di,r.startDate,r.endDate));
         const hasSp=rs.some(r=>r.property==='sp'),hasPn=rs.some(r=>r.property==='pn');
-        h+=`<div class="mc-d${isT?' today':''}" onclick="go('cal')"><span>${d}</span>`;
-        if(hasSp||hasPn){
-            h+='<div class="mc-dots">';
-            if(hasSp)h+='<span class="mc-dot sp"></span>';
-            if(hasPn)h+='<span class="mc-dot pn"></span>';
-            h+='</div>';
-        }
-        h+='</div>';
+        let cls='mc-d';
+        if(isT)cls+=' today';
+        if(hasSp&&hasPn)cls+=' has-both';
+        else if(hasSp)cls+=' has-sp';
+        else if(hasPn)cls+=' has-pn';
+        h+=`<div class="${cls}" onclick="go('cal')"><span>${d}</span></div>`;
     }
     h+='</div>';
     document.getElementById('miniCal').innerHTML=h;
