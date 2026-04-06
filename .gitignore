@@ -1,0 +1,14 @@
+# Fichiers système
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Fichiers temporaires
+*.tmp
+~$*
+
+# Node
+node_modules/
+
+# Backups
+Bkp/

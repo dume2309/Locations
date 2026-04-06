@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Locations</title>
+    <!-- PWA iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Locations">
+    <meta name="theme-color" content="#1e40af">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --blue: #2563eb; --blue-bg: #eff6ff; --blue-dark: #1e40af;
+            --green: #059669; --green-bg: #ecfdf5;
+            --orange: #d97706; --orange-bg: #fffbeb;
+            --red: #dc2626; --red-bg: #fef2f2;
+            --purple: #7c3aed; --purple-bg: #f5f3ff;
+            --g: #6b7280; --gl: #f3f4f6; --gb: #e5e7eb;
+            --dark: #1f2937;
+            --r: 12px;
+            --safe-b: env(safe-area-inset-bottom, 0px);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+            background: #f0f4f8; color: var(--dark); -webkit-user-select: none; user-select: none;
+            padding-top: env(safe-area-inset-top, 0px);
+        }
+        input, textarea, select { -webkit-user-select: auto; user-select: auto; }
+
+        /* ===== NAV BOTTOM (style iOS tab bar) ===== */
+        .tab-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 0.5px solid rgba(0,0,0,0.12);
+            display: flex; z-index: 100;
+            padding-bottom: var(--safe-b);
+        }
+        .tab-bar button {
+            flex: 1; border: none; background: none; padding: 6px 0 4px;
+            display: flex; flex-direction: column; align-items: center; gap: 1px;
+            font-size: 0.62rem; color: var(--g); cursor: pointer; font-weight: 500;
+            transition: color 0.15s;
+        }
+        .tab-bar button.on { color: var(--blue); }
+        .tab-bar .ti { font-size: 1.4rem; height: 28px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .tab-bar .badge {
+            position: absolute; top: -2px; right: -8px;
+            background: var(--red); color: white; font-size: 0.6rem; font-weight: 700;
+            min-width: 16px; height: 16px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; padding: 0 4px;
+        }
+
+        /* ===== TOP BAR ===== */
+        .top {
+            background: linear-gradient(180deg, var(--blue-dark), var(--blue));
+            color: white; padding: 14px 16px 12px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .top h1 { font-size: 1.15rem; font-weight: 700; }
+        .top-btns { display: flex; gap: 8px; }
+        .top-btn {
+            width: 34px; height: 34px; border-radius: 50%; border: none;
+            background: rgba(255,255,255,0.18); color: white; cursor: pointer;
+            font-size: 1rem; display: flex; align-items: center; justify-content: center;
+        }
+        .top-btn:active { background: rgba(255,255,255,0.35); }
+        .unsaved-dot { width: 7px; height: 7px; background: #fbbf24; border-radius: 50%; position: absolute; top: 0; right: 0; display: none; }
+
+        /* ===== PAGES ===== */
+        .pg { display: none; padding: 0 16px 100px; max-width: 900px; margin: 0 auto; }
+        .pg.on { display: block; }
+
+        /* ===== PROPERTY STATUS CARDS (Home) ===== */
+        .prop-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 14px; }
+        .prop-card {
+            border-radius: var(--r); padding: 14px; position: relative; overflow: hidden;
+            color: white; min-height: 120px; display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .prop-card.sp { background: linear-gradient(135deg, #059669, #34d399); }
+        .prop-card.pn { background: linear-gradient(135deg, #d97706, #fbbf24); }
+        .prop-card .pc-name { font-size: 0.82rem; font-weight: 600; opacity: 0.9; }
+        .prop-card .pc-status { font-size: 1.1rem; font-weight: 800; margin-top: 6px; }
+        .prop-card .pc-detail { font-size: 0.72rem; opacity: 0.85; margin-top: 4px; }
+        .prop-card .pc-icon { position: absolute; top: 10px; right: 12px; font-size: 1.6rem; opacity: 0.3; }
+
+        /* ===== SECTION ===== */
+        .sec-title { font-size: 0.78rem; font-weight: 700; color: var(--g); text-transform: uppercase; letter-spacing: 0.5px; margin: 18px 0 10px; }
+
+        /* ===== ALERT TIMELINE ===== */
+        .timeline { position: relative; padding-left: 24px; }
+        .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--gb); border-radius: 1px; }
+        .tl-item {
+            position: relative; margin-bottom: 12px; padding: 12px 14px;
+            background: white; border-radius: var(--r); box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            cursor: pointer;
+        }
+        .tl-item:active { background: var(--gl); }
+        .tl-dot {
+            position: absolute; left: -20px; top: 16px; width: 12px; height: 12px;
+            border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 1px var(--gb);
+        }
+        .tl-dot.today { background: var(--red); }
+        .tl-dot.soon { background: var(--orange); }
+        .tl-dot.later { background: var(--blue); }
+        .tl-dot.clean { background: var(--purple); }
+        .tl-when { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; margin-bottom: 3px; }
+        .tl-when.today { color: var(--red); }
+        .tl-when.soon { color: var(--orange); }
+        .tl-when.later { color: var(--blue); }
+        .tl-when.clean { color: var(--purple); }
+        .tl-title { font-weight: 700; font-size: 0.9rem; }
+        .tl-sub { font-size: 0.78rem; color: var(--g); margin-top: 2px; }
+        .tl-sms {
+            display: inline-flex; align-items: center; gap: 4px;
+            margin-top: 6px; padding: 4px 10px; border-radius: 6px;
+            background: #25D366; color: white; font-size: 0.72rem; font-weight: 600;
+            border: none; cursor: pointer;
+        }
+        .tl-sms:active { opacity: 0.8; }
+
+        /* ===== MINI CALENDAR (Home) ===== */
+        .mini-cal { background: white; border-radius: var(--r); padding: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .mini-cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .mini-cal-title { font-weight: 700; font-size: 0.88rem; }
+        .mini-cal-nav { display: flex; gap: 4px; }
+        .mini-cal-nav button { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--gb); background: white; cursor: pointer; font-size: 0.8rem; }
+        .mc-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 1px; }
+        .mc-hd { text-align: center; font-size: 0.6rem; font-weight: 600; color: var(--g); padding: 4px 0; }
+        .mc-d {
+            text-align: center; padding: 5px 2px; font-size: 0.72rem; border-radius: 6px;
+            position: relative; cursor: pointer;
+        }
+        .mc-d.today { background: var(--blue); color: white; font-weight: 700; border-radius: 50%; }
+        .mc-d.empty { visibility: hidden; }
+        .mc-d .mc-dots { display: flex; justify-content: center; gap: 2px; margin-top: 1px; }
+        .mc-d .mc-dot { width: 4px; height: 4px; border-radius: 50%; }
+        .mc-d .mc-dot.sp { background: var(--green); }
+        .mc-d .mc-dot.pn { background: var(--orange); }
+
+        /* ===== QUICK STATS ===== */
+        .qstats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .qs {
+            background: white; border-radius: var(--r); padding: 12px 8px;
+            text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .qs-n { font-size: 1.3rem; font-weight: 800; }
+        .qs-l { font-size: 0.62rem; color: var(--g); margin-top: 2px; font-weight: 500; }
+
+        /* ===== CARDS ===== */
+        .card { background: white; border-radius: var(--r); box-shadow: 0 1px 3px rgba(0,0,0,0.06); padding: 14px; margin-bottom: 10px; }
+
+        /* ===== RESERVATION CARD ===== */
+        .rc {
+            background: white; border-radius: var(--r); box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            padding: 14px; margin-bottom: 10px; cursor: pointer; border-left: 4px solid transparent;
+        }
+        .rc:active { background: var(--gl); }
+        .rc.sp-border { border-left-color: var(--green); }
+        .rc.pn-border { border-left-color: var(--orange); }
+        .rc-top { display: flex; justify-content: space-between; align-items: center; }
+        .rc-name { font-weight: 700; font-size: 0.95rem; }
+        .rc-dates { font-size: 0.78rem; color: var(--g); }
+        .rc-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .tag {
+            display: inline-flex; align-items: center; gap: 3px;
+            padding: 3px 10px; border-radius: 20px; font-size: 0.68rem; font-weight: 600;
+        }
+        .t-sp { background: var(--green-bg); color: var(--green); }
+        .t-pn { background: var(--orange-bg); color: var(--orange); }
+        .t-airbnb { background: var(--red-bg); color: var(--red); }
+        .t-homerez { background: var(--blue-bg); color: var(--blue); }
+        .t-pulse { background: var(--purple-bg); color: var(--purple); }
+        .t-direct { background: var(--green-bg); color: var(--green); }
+        .t-clean { background: var(--purple-bg); color: var(--purple); }
+        .t-info { background: var(--gl); color: var(--g); }
+
+        /* ===== FILTERS ===== */
+        .filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .fp {
+            padding: 7px 16px; border-radius: 20px; border: 1.5px solid var(--gb);
+            background: white; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+            white-space: nowrap;
+        }
+        .fp.on { background: var(--blue); color: white; border-color: var(--blue); }
+
+        /* ===== CALENDAR FULL ===== */
+        .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 0 4px; }
+        .cal-title { font-size: 1.05rem; font-weight: 700; }
+        .cal-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--gb); background: white; cursor: pointer; font-size: 1rem; }
+        .cal-btn:active { background: var(--gl); }
+        .cg { display: grid; grid-template-columns: repeat(7,1fr); gap: 1px; background: var(--gb); border-radius: var(--r); overflow: hidden; }
+        .ch { background: var(--gl); text-align: center; padding: 8px 2px; font-size: 0.7rem; font-weight: 700; color: var(--g); }
+        .cd {
+            background: white; min-height: 52px; padding: 3px; font-size: 0.72rem;
+            cursor: pointer; position: relative;
+        }
+        .cd:active { background: var(--blue-bg); }
+        .cd.empty { background: #fafbfc; cursor: default; }
+        .cd.today { background: var(--blue-bg); }
+        .cd .dn { font-weight: 700; font-size: 0.72rem; margin-bottom: 1px; }
+        .cd.today .dn { color: var(--blue); }
+        .cb { display: block; padding: 1px 3px; border-radius: 3px; font-size: 0.58rem; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+        .cb.sp { background: var(--green-bg); color: var(--green); }
+        .cb.pn { background: var(--orange-bg); color: var(--orange); }
+
+        /* ===== CODES ===== */
+        .code-card { border-radius: var(--r); padding: 16px; margin-bottom: 12px; color: white; }
+        .code-card.sp { background: linear-gradient(135deg, #059669, #34d399); }
+        .code-card.pn { background: linear-gradient(135deg, #d97706, #fbbf24); }
+        .code-card h3 { font-size: 0.95rem; margin-bottom: 12px; }
+        .code-row {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,255,255,0.2); border-radius: 8px; padding: 10px 12px;
+            margin-bottom: 8px; backdrop-filter: blur(4px);
+        }
+        .code-lbl { font-size: 0.72rem; opacity: 0.8; }
+        .code-val { font-size: 1.15rem; font-weight: 800; font-family: 'Courier New', monospace; letter-spacing: 2px; }
+        .code-copy {
+            background: rgba(255,255,255,0.3); border: none; color: white;
+            width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .code-copy:active { background: rgba(255,255,255,0.5); }
+        .share-block {
+            margin-top: 10px; padding: 12px; background: rgba(255,255,255,0.15);
+            border-radius: 8px; backdrop-filter: blur(4px);
+        }
+        .share-block pre {
+            white-space: pre-wrap; font-size: 0.8rem; margin-bottom: 10px;
+            font-family: inherit; opacity: 0.9;
+        }
+        .share-row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .sbtn {
+            padding: 7px 14px; border-radius: 8px; border: none; font-size: 0.78rem;
+            font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .sbtn:active { opacity: 0.8; }
+        .sbtn-copy { background: rgba(255,255,255,0.3); color: white; }
+        .sbtn-wa { background: #25D366; color: white; }
+        .sbtn-sms { background: rgba(255,255,255,0.95); color: var(--dark); }
+
+        /* ===== CONTACTS ===== */
+        .ct {
+            display: flex; align-items: center; gap: 12px; padding: 14px;
+            background: white; border-radius: var(--r); box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            margin-bottom: 8px;
+        }
+        .ct-av { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 700; color: white; flex-shrink: 0; }
+        .ct-info { flex: 1; }
+        .ct-name { font-weight: 700; font-size: 0.9rem; }
+        .ct-role { font-size: 0.72rem; color: var(--g); }
+        .ct-phone { font-size: 0.82rem; color: var(--blue); margin-top: 2px; }
+        .ct-edit { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--gb); background: white; cursor: pointer; font-size: 0.9rem; }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 12px 20px; border: none; border-radius: var(--r);
+            font-size: 0.88rem; font-weight: 600; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .btn:active { opacity: 0.85; }
+        .btn-blue { background: var(--blue); color: white; }
+        .btn-red { background: var(--red); color: white; }
+        .btn-out { background: white; color: var(--dark); border: 1.5px solid var(--gb); }
+        .btn-sm { padding: 7px 14px; font-size: 0.78rem; }
+        .btn-full { width: 100%; }
+        .btn-grp { display: flex; gap: 8px; }
+        .btn-grp .btn { flex: 1; }
+
+        /* ===== MODALS (iOS sheet style) ===== */
+        .sheet-bg {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+            z-index: 200; align-items: flex-end; justify-content: center;
+        }
+        .sheet-bg.on { display: flex; }
+        .sheet {
+            background: white; border-radius: 16px 16px 0 0; width: 100%; max-width: 600px;
+            max-height: 88vh; overflow-y: auto; animation: sheetUp 0.25s ease;
+            padding-bottom: var(--safe-b);
+        }
+        @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .sheet-bar { width: 36px; height: 5px; background: var(--gb); border-radius: 3px; margin: 8px auto 4px; }
+        .sheet-title { padding: 8px 20px 14px; font-size: 1.05rem; font-weight: 700; }
+        .sheet-body { padding: 0 20px 16px; }
+        .sheet-foot { padding: 10px 20px 16px; display: flex; gap: 8px; }
+
+        /* ===== FORMS ===== */
+        .fd { margin-bottom: 14px; }
+        .fd label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--g); margin-bottom: 4px; }
+        .fd input, .fd select, .fd textarea {
+            width: 100%; padding: 11px 14px; border: 1.5px solid var(--gb);
+            border-radius: var(--r); font-size: 0.9rem; background: var(--gl);
+        }
+        .fd input:focus, .fd select:focus { outline: none; border-color: var(--blue); background: white; box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
+        .fd-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        /* ===== TOAST ===== */
+        .toast-c { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 400; }
+        .toast {
+            background: var(--dark); color: white; padding: 10px 20px;
+            border-radius: 25px; font-size: 0.82rem; font-weight: 500;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15); animation: tIn 0.3s;
+            white-space: nowrap;
+        }
+        .toast.ok { background: var(--green); }
+        .toast.err { background: var(--red); }
+        @keyframes tIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; } }
+
+        /* ===== PRINT ===== */
+        @media print {
+            .tab-bar, .top, .sheet-bg, .toast-c, button, .filters, .btn, .prop-cards, .timeline, .mini-cal, .qstats { display: none !important; }
+            .pg { display: block !important; padding: 0; }
+            #pg-home, #pg-cal, #pg-set { display: none !important; }
+            #pg-res { display: block !important; }
+            body { background: white; }
+            .rc { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+            h2.ptitle { display: block !important; text-align: center; font-size: 14pt; margin: 12pt 0; }
+        }
+        h2.ptitle { display: none; }
+
+        /* ===== RESPONSIVE ===== */
+        /* iPhone SE / small */
+        @media (max-width: 375px) {
+            .prop-cards { grid-template-columns: 1fr; }
+            .qstats { grid-template-columns: repeat(2, 1fr); }
+            .prop-card { min-height: 90px; }
+        }
+        /* iPad portrait */
+        @media (min-width: 768px) {
+            .pg { padding: 0 24px 100px; }
+            .prop-cards { gap: 14px; }
+            .prop-card { min-height: 140px; padding: 20px; }
+            .prop-card .pc-status { font-size: 1.3rem; }
+            .qstats { grid-template-columns: repeat(4, 1fr); gap: 12px; }
+            .qs-n { font-size: 1.6rem; }
+            .cd { min-height: 72px; }
+            .cb { font-size: 0.65rem; }
+            .rc { padding: 16px; }
+            .sheet { max-width: 500px; border-radius: 16px; margin-bottom: 10vh; }
+        }
+        /* iPad landscape / desktop */
+        @media (min-width: 1024px) {
+            .prop-cards { grid-template-columns: 1fr 1fr; }
+            .home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+            .tab-bar { left: auto; right: auto; max-width: 400px; left: 50%; transform: translateX(-50%); border-radius: 16px 16px 0 0; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top">
+    <h1>🏠 Locations</h1>
+    <div class="top-btns">
+        <button class="top-btn" onclick="openMenu()" style="position:relative">⚙️<span class="unsaved-dot" id="uDot"></span></button>
+    </div>
+</div>
+
+<!-- ===== PAGE ACCUEIL ===== -->
+<div class="pg on" id="pg-home">
+    <!-- Cartes propriétés -->
+    <div class="prop-cards" id="propCards"></div>
+
+    <div class="home-grid">
+        <div>
+            <!-- Timeline -->
+            <div class="sec-title">📅 Prochains événements</div>
+            <div class="timeline" id="homeTL"></div>
+        </div>
+        <div>
+            <!-- Mini calendrier -->
+            <div class="sec-title">🗓️ Ce mois</div>
+            <div class="mini-cal" id="miniCal"></div>
+            <!-- Stats -->
+            <div class="sec-title" style="margin-top:16px">📊 Saison 2025</div>
+            <div class="qstats" id="homeStats"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== PAGE CALENDRIER ===== -->
+<div class="pg" id="pg-cal">
+    <div style="padding-top:14px">
+        <div class="cal-nav">
+            <button class="cal-btn" onclick="cMov(-1)">◀</button>
+            <span class="cal-title" id="cTitle"></span>
+            <button class="cal-btn" onclick="cMov(1)">▶</button>
+        </div>
+        <div class="filters" style="justify-content:center;margin-bottom:10px">
+            <span class="fp on" data-f="all" onclick="cFilt(this)">Tous</span>
+            <span class="fp" data-f="sp" onclick="cFilt(this)">🟢 Santu Pietru</span>
+            <span class="fp" data-f="pn" onclick="cFilt(this)">🟠 Pietranera</span>
+        </div>
+        <div class="cg" id="calG"></div>
+        <div style="display:flex;gap:14px;justify-content:center;margin-top:10px;font-size:0.72rem;color:var(--g)">
+            <span>🟢 Santu Pietru</span><span>🟠 Pietranera</span>
+        </div>
+    </div>
+</div>
+
+<!-- ===== PAGE RESERVATIONS ===== -->
+<div class="pg" id="pg-res">
+    <h2 class="ptitle">Calendrier des Locations 2025</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-bottom:4px">
+        <div class="filters" style="margin-bottom:0">
+            <span class="fp on" data-f="all" onclick="rFilt(this)">Toutes</span>
+            <span class="fp" data-f="sp" onclick="rFilt(this)">🟢 SP</span>
+            <span class="fp" data-f="pn" onclick="rFilt(this)">🟠 PN</span>
+        </div>
+        <button class="btn btn-blue btn-sm" onclick="openForm()">+ Ajouter</button>
+    </div>
+    <div id="resList"></div>
+</div>
+
+<!-- ===== PAGE RÉGLAGES ===== -->
+<div class="pg" id="pg-set">
+    <div style="padding-top:14px">
+        <div class="sec-title">🔑 Codes d'accès</div>
+        <div id="codesArea"></div>
+
+        <div class="sec-title">👥 Contacts</div>
+        <div id="ctArea"></div>
+
+        <div class="sec-title">💾 Données</div>
+        <div class="card">
+            <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="expJSON()">💾 Sauvegarder (JSON)</button>
+            <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="document.getElementById('impF').click()">📂 Importer (JSON)</button>
+            <input type="file" id="impF" accept=".json" style="display:none" onchange="impJSON(event)">
+            <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="expCSV()">📊 Export Excel (CSV)</button>
+            <button class="btn btn-out btn-full" onclick="window.print()">🖨️ Imprimer</button>
+        </div>
+    </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+    <button class="on" onclick="go('home')" data-p="home"><span class="ti">🏠</span>Accueil</button>
+    <button onclick="go('cal')" data-p="cal"><span class="ti">📅</span>Calendrier</button>
+    <button onclick="go('res')" data-p="res"><span class="ti">📋</span>Réservations</button>
+    <button onclick="go('set')" data-p="set"><span class="ti" style="position:relative">⚙️</span>Réglages</button>
+</div>
+
+<!-- SHEET : FORM RESERVATION -->
+<div class="sheet-bg" id="shForm">
+    <div class="sheet">
+        <div class="sheet-bar"></div>
+        <div class="sheet-title" id="fTitle">Nouvelle réservation</div>
+        <div class="sheet-body">
+            <input type="hidden" id="fId">
+            <div class="fd-row">
+                <div class="fd"><label>Propriété</label><select id="fProp"><option value="sp">Santu Pietru</option><option value="pn">Pietranera</option></select></div>
+                <div class="fd"><label>Plateforme</label><select id="fPlat"><option value="AIRBNB">Airbnb</option><option value="HOMEREZ">Homerez</option><option value="PULSE">Pulse</option><option value="DIRECT">Direct</option></select></div>
+            </div>
+            <div class="fd"><label>Nom du locataire</label><input type="text" id="fName" placeholder="Nom"></div>
+            <div class="fd-row">
+                <div class="fd"><label>Arrivée</label><input type="date" id="fStart"></div>
+                <div class="fd"><label>Départ</label><input type="date" id="fEnd"></div>
+            </div>
+            <div class="fd-row">
+                <div class="fd"><label>Personnes</label><input type="number" id="fPers" min="1" max="20" value="1"></div>
+                <div class="fd"><label>Montant (€)</label><input type="number" id="fAmt" min="0" step="0.01" placeholder="—"></div>
+            </div>
+            <div class="fd"><label>🧹 Ménage</label><select id="fClean"><option value="">— Non attribué —</option><option value="Laetitia">Laetitia</option><option value="Steph">Steph</option><option value="Bea">Bea</option><option value="Bea / Steph">Bea / Steph</option></select></div>
+            <div class="fd"><label>Notes</label><textarea id="fNotes" rows="2" placeholder="Optionnel"></textarea></div>
+        </div>
+        <div class="sheet-foot">
+            <button class="btn btn-out" style="flex:1" onclick="closeSheet('shForm')">Annuler</button>
+            <button class="btn btn-red btn-sm" id="fDel" style="display:none" onclick="delR()">Supprimer</button>
+            <button class="btn btn-blue" style="flex:1" onclick="saveR()">Enregistrer</button>
+        </div>
+    </div>
+</div>
+
+<!-- SHEET : DETAIL -->
+<div class="sheet-bg" id="shDetail">
+    <div class="sheet">
+        <div class="sheet-bar"></div>
+        <div class="sheet-title">Détail</div>
+        <div class="sheet-body" id="detBody"></div>
+        <div class="sheet-foot" id="detFoot"></div>
+    </div>
+</div>
+
+<!-- SHEET : MENU -->
+<div class="sheet-bg" id="shMenu">
+    <div class="sheet">
+        <div class="sheet-bar"></div>
+        <div class="sheet-title">Menu</div>
+        <div class="sheet-body">
+            <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="expJSON();closeSheet('shMenu')">💾 Sauvegarder</button>
+            <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="document.getElementById('impF').click();closeSheet('shMenu')">📂 Importer</button>
+            <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="expCSV();closeSheet('shMenu')">📊 Excel</button>
+            <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="closeSheet('shMenu');setTimeout(()=>window.print(),300)">🖨️ Imprimer</button>
+            <button class="btn btn-out btn-full" onclick="closeSheet('shMenu')">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-c" id="toastC"></div>
+
+<script>
+// ===== DATA =====
+const SK='loc_v3', CK='loc_ct_v1';
+const INIT={"properties":{"sp":{"name":"Santu Pietru","wifi":"","keyBox":""},"pn":{"name":"Pietranera","wifi":"","keyBox":""}},"reservations":[{"id":"excel_sp_1","property":"sp","platform":"HOMEREZ","guestName":"L-Dufour","startDate":"2025-03-27","endDate":"2025-03-30","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_2","property":"sp","platform":"HOMEREZ","guestName":"A-Foivard","startDate":"2025-04-04","endDate":"2025-04-11","persons":10,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_3","property":"sp","platform":"AIRBNB","guestName":"M-Freyssinet","startDate":"2025-04-12","endDate":"2025-04-13","persons":10,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_4","property":"sp","platform":"AIRBNB","guestName":"I M OLIVIER","startDate":"2025-04-17","endDate":"2025-04-18","persons":7,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_5","property":"sp","platform":"HOMEREZ","guestName":"C-Mendes","startDate":"2025-04-18","endDate":"2025-04-25","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_6","property":"sp","platform":"AIRBNB","guestName":"A C POLETTI","startDate":"2025-04-27","endDate":"2025-04-30","persons":6,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_7","property":"sp","platform":"AIRBNB","guestName":"T-blanchot","startDate":"2025-05-23","endDate":"2025-05-24","persons":6,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_8","property":"sp","platform":"HOMEREZ","guestName":"M-Celegato","startDate":"2025-06-17","endDate":"2025-06-27","persons":8,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_9","property":"sp","platform":"AIRBNB","guestName":"S-Halm","startDate":"2025-07-13","endDate":"2025-07-19","persons":8,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_10","property":"sp","platform":"AIRBNB","guestName":"D-Quiles","startDate":"2025-07-20","endDate":"2025-07-28","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_11","property":"sp","platform":"AIRBNB","guestName":"H Larbernede","startDate":"2025-07-29","endDate":"2025-08-01","persons":8,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_12","property":"sp","platform":"AIRBNB","guestName":"N Vigroux","startDate":"2025-08-01","endDate":"2025-08-06","persons":8,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_13","property":"sp","platform":"AIRBNB","guestName":"C-Froger","startDate":"2025-08-06","endDate":"2025-08-11","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_14","property":"sp","platform":"AIRBNB","guestName":"D R FIRENZE","startDate":"2025-08-11","endDate":"2025-08-15","persons":7,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_15","property":"sp","platform":"HOMEREZ","guestName":"C-Guillonneau","startDate":"2025-08-15","endDate":"2025-08-22","persons":10,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_16","property":"sp","platform":"AIRBNB","guestName":"G-L'Epinoy","startDate":"2025-08-23","endDate":"2025-08-27","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_17","property":"sp","platform":"AIRBNB","guestName":"C Payet","startDate":"2025-09-25","endDate":"2025-09-28","persons":5,"amount":0,"cleaning":"","notes":""},{"id":"excel_pn_18","property":"pn","platform":"AIRBNB","guestName":"V Avudenez","startDate":"2025-04-24","endDate":"2025-04-25","persons":4,"amount":0,"cleaning":"","notes":""},{"id":"excel_pn_19","property":"pn","platform":"AIRBNB","guestName":"J Rutin","startDate":"2025-07-16","endDate":"2025-07-18","persons":4,"amount":0,"cleaning":"","notes":""},{"id":"excel_pn_20","property":"pn","platform":"PULSE","guestName":"M-Plachtova","startDate":"2025-06-29","endDate":"2025-07-09","persons":2,"amount":1366.9,"cleaning":"","notes":""},{"id":"excel_pn_21","property":"pn","platform":"PULSE","guestName":"F-Nardone","startDate":"2025-08-06","endDate":"2025-08-11","persons":5,"amount":796.25,"cleaning":"","notes":""}],"version":1};
+const DEF_CT={laetitia:{name:'Laetitia',role:'Femme de ménage',phone:'',color:'#7c3aed'},steph:{name:'Steph',role:'Propriétaire',phone:'',color:'#059669'},bea:{name:'Bea',role:'Propriétaire',phone:'',color:'#d97706'}};
+
+let D,CT,cM=new Date().getMonth(),cY=new Date().getFullYear(),cf='all',rf='all',dirty=false;
+
+function ld(){try{const r=localStorage.getItem(SK);if(r){D=JSON.parse(r);if(D.reservations)return;}}catch(e){}D=JSON.parse(JSON.stringify(INIT));localStorage.setItem(SK,JSON.stringify(D));}
+function ldC(){try{const r=localStorage.getItem(CK);if(r){CT=JSON.parse(r);return;}}catch(e){}CT=JSON.parse(JSON.stringify(DEF_CT));localStorage.setItem(CK,JSON.stringify(CT));}
+function sv(){localStorage.setItem(SK,JSON.stringify(D));dirty=true;document.getElementById('uDot').style.display='block';refresh();}
+function svC(){localStorage.setItem(CK,JSON.stringify(CT));}
+
+// Helpers
+function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
+function pd(s){return s?new Date(s+'T00:00:00'):null;}
+function fd(s){const d=pd(s);return d?d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}):'';}
+function fds(s){const d=pd(s);return d?d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}):'';}
+function dys(a,b){return Math.round((pd(b)-pd(a))/864e5);}
+function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function pnm(id){return D.properties[id]?.name||id;}
+function inR(d,s,e){const x=pd(d),a=pd(s),b=pd(e);return x>=a&&x<=b;}
+function toast(m,t=''){const c=document.getElementById('toastC'),e=document.createElement('div');e.className='toast '+t;e.textContent=m;c.appendChild(e);setTimeout(()=>{e.style.opacity='0';e.style.transition='opacity .3s';setTimeout(()=>e.remove(),300);},2500);}
+
+// ===== NAV =====
+function go(p){document.querySelectorAll('.pg').forEach(x=>x.classList.remove('on'));document.getElementById('pg-'+p).classList.add('on');document.querySelectorAll('.tab-bar button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));refresh();}
+
+// ===== HOME =====
+function renderHome(){
+    const now=new Date();now.setHours(0,0,0,0);
+    const td=iso(now), yr=now.getFullYear();
+    const all=D.reservations, yrR=all.filter(r=>pd(r.startDate).getFullYear()===yr);
+
+    // Property status
+    let pc='';
+    ['sp','pn'].forEach(pid=>{
+        const p=D.properties[pid];
+        const active=all.find(r=>r.property===pid&&inR(td,r.startDate,r.endDate));
+        const next=all.filter(r=>r.property===pid&&pd(r.startDate)>now).sort((a,b)=>pd(a.startDate)-pd(b.startDate))[0];
+        let status,detail;
+        if(active){
+            status=`Occupé — ${active.guestName}`;
+            detail=`${active.persons} pers. · jusqu'au ${fds(active.endDate)}`;
+        }else if(next){
+            const d=Math.round((pd(next.startDate)-now)/864e5);
+            status='Libre';
+            detail=`Prochaine arrivée dans ${d}j · ${next.guestName}`;
+        }else{
+            status='Libre';
+            detail='Aucune réservation à venir';
+        }
+        pc+=`<div class="prop-card ${pid}">
+            <div class="pc-icon">${pid==='sp'?'🏡':'🏠'}</div>
+            <div><div class="pc-name">${p.name}</div><div class="pc-status">${status}</div></div>
+            <div class="pc-detail">${detail}</div>
+        </div>`;
+    });
+    document.getElementById('propCards').innerHTML=pc;
+
+    // Timeline
+    const in7=new Date(now);in7.setDate(in7.getDate()+10);
+    let events=[];
+    all.forEach(r=>{
+        const s=pd(r.startDate);s.setHours(0,0,0,0);
+        const e=pd(r.endDate);e.setHours(0,0,0,0);
+        const ds=Math.round((s-now)/864e5);
+        const de=Math.round((e-now)/864e5);
+        if(ds>=0&&ds<=10){
+            events.push({sort:ds*10,type:ds===0?'today':'soon',icon:'🏠',when:ds===0?"Aujourd'hui":`Dans ${ds} jour${ds>1?'s':''}`,title:`Arrivée — ${r.guestName}`,sub:`${pnm(r.property)} · ${r.persons} pers. · ${r.platform}`,id:r.id});
+            if(r.cleaning){
+                const hasPhone=r.cleaning==='Laetitia'&&CT.laetitia.phone;
+                events.push({sort:ds*10+1,type:'clean',icon:'🧹',when:ds===0?"Ménage aujourd'hui":`Ménage dans ${ds}j`,title:`${r.cleaning} — ${pnm(r.property)}`,sub:`Avant arrivée de ${r.guestName}`,id:r.id,sms:r.cleaning==='Laetitia'?r.id:null});
+            }
+        }
+        if(de>=0&&de<=7){
+            events.push({sort:de*10+2,type:de===0?'today':'soon',icon:'👋',when:de===0?"Aujourd'hui":`Dans ${de} jour${de>1?'s':''}`,title:`Départ — ${r.guestName}`,sub:pnm(r.property),id:r.id});
+        }
+    });
+    events.sort((a,b)=>a.sort-b.sort);
+    const tl=document.getElementById('homeTL');
+    if(!events.length){tl.innerHTML='<div style="text-align:center;padding:30px;color:var(--g)">✅ Rien de prévu ces prochains jours</div>';
+    }else{
+        tl.innerHTML=events.slice(0,10).map(e=>`
+            <div class="tl-item" onclick="showDet('${e.id}')">
+                <div class="tl-dot ${e.type}"></div>
+                <div class="tl-when ${e.type}">${e.icon} ${e.when}</div>
+                <div class="tl-title">${e.title}</div>
+                <div class="tl-sub">${e.sub}</div>
+                ${e.sms?`<button class="tl-sms" onclick="event.stopPropagation();smsLae('${e.sms}')">📱 SMS Laetitia</button>`:''}
+            </div>
+        `).join('');
+    }
+
+    // Mini calendar
+    renderMiniCal();
+
+    // Stats
+    const spR=yrR.filter(r=>r.property==='sp'),pnR=yrR.filter(r=>r.property==='pn');
+    const totD=yrR.reduce((s,r)=>s+dys(r.startDate,r.endDate),0);
+    const rev=yrR.reduce((s,r)=>s+(r.amount||0),0);
+    document.getElementById('homeStats').innerHTML=`
+        <div class="qs"><div class="qs-n">${yrR.length}</div><div class="qs-l">Réservations</div></div>
+        <div class="qs"><div class="qs-n" style="color:var(--green)">${spR.length}</div><div class="qs-l">Santu Pietru</div></div>
+        <div class="qs"><div class="qs-n" style="color:var(--orange)">${pnR.length}</div><div class="qs-l">Pietranera</div></div>
+        <div class="qs"><div class="qs-n">${totD}j</div><div class="qs-l">Jours loués</div></div>
+    `;
+}
+
+function renderMiniCal(){
+    const now=new Date(),m=now.getMonth(),y=now.getFullYear();
+    const MN=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+    const DN=['L','M','M','J','V','S','D'];
+    const dim=new Date(y,m+1,0).getDate();
+    let s=new Date(y,m,1).getDay()-1;if(s<0)s=6;
+    let h=`<div class="mini-cal-head"><span class="mini-cal-title">${MN[m]} ${y}</span></div>`;
+    h+='<div class="mc-grid">';
+    DN.forEach(d=>{h+=`<div class="mc-hd">${d}</div>`;});
+    for(let i=0;i<s;i++)h+='<div class="mc-d empty"></div>';
+    for(let d=1;d<=dim;d++){
+        const di=iso(new Date(y,m,d));
+        const isT=now.getDate()===d;
+        const rs=D.reservations.filter(r=>inR(di,r.startDate,r.endDate));
+        const hasSp=rs.some(r=>r.property==='sp'),hasPn=rs.some(r=>r.property==='pn');
+        h+=`<div class="mc-d${isT?' today':''}" onclick="go('cal')"><span>${d}</span>`;
+        if(hasSp||hasPn){
+            h+='<div class="mc-dots">';
+            if(hasSp)h+='<span class="mc-dot sp"></span>';
+            if(hasPn)h+='<span class="mc-dot pn"></span>';
+            h+='</div>';
+        }
+        h+='</div>';
+    }
+    h+='</div>';
+    document.getElementById('miniCal').innerHTML=h;
+}
+
+// ===== CALENDAR =====
+const MNames=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+const DNames=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+function cMov(d){cM+=d;if(cM<0){cM=11;cY--;}if(cM>11){cM=0;cY++;}renderCal();}
+function cFilt(el){document.querySelectorAll('#pg-cal .fp').forEach(p=>p.classList.remove('on'));el.classList.add('on');cf=el.dataset.f;renderCal();}
+
+function renderCal(){
+    document.getElementById('cTitle').textContent=MNames[cM]+' '+cY;
+    const g=document.getElementById('calG');
+    let h=DNames.map(d=>`<div class="ch">${d}</div>`).join('');
+    const first=new Date(cY,cM,1);let s=first.getDay()-1;if(s<0)s=6;
+    const dim=new Date(cY,cM+1,0).getDate();
+    const now=new Date();
+    const rs=D.reservations.filter(r=>{if(cf!=='all'&&r.property!==cf)return false;const a=pd(r.startDate),b=pd(r.endDate);return a<=new Date(cY,cM,dim,23,59)&&b>=first;});
+    for(let i=0;i<s;i++)h+='<div class="cd empty"></div>';
+    for(let d=1;d<=dim;d++){
+        const di=iso(new Date(cY,cM,d));
+        const isT=now.getFullYear()===cY&&now.getMonth()===cM&&now.getDate()===d;
+        const dr=rs.filter(r=>inR(di,r.startDate,r.endDate));
+        h+=`<div class="cd${isT?' today':''}${!dr.length?' empty':''}" onclick="calClick('${di}')"><div class="dn">${d}</div>`;
+        dr.forEach(r=>{h+=`<span class="cb ${r.property==='sp'?'sp':'pn'}">${r.guestName}</span>`;});
+        h+='</div>';
+    }
+    g.innerHTML=h;
+}
+function calClick(di){const dr=D.reservations.filter(r=>inR(di,r.startDate,r.endDate));if(dr.length)showDet(dr[0].id);}
+
+// ===== RESERVATIONS =====
+function rFilt(el){document.querySelectorAll('#pg-res .fp').forEach(p=>p.classList.remove('on'));el.classList.add('on');rf=el.dataset.f;renderRes();}
+function renderRes(){
+    let list=[...D.reservations];
+    if(rf!=='all')list=list.filter(r=>r.property===rf);
+    list.sort((a,b)=>pd(a.startDate)-pd(b.startDate));
+    document.getElementById('resList').innerHTML=list.length?list.map(r=>{
+        const d=dys(r.startDate,r.endDate);
+        return `<div class="rc ${r.property}-border" onclick="showDet('${r.id}')">
+            <div class="rc-top"><span class="rc-name">${r.guestName}</span><span class="rc-dates">${fds(r.startDate)} → ${fds(r.endDate)}</span></div>
+            <div class="rc-tags">
+                <span class="tag t-${r.property}">${pnm(r.property)}</span>
+                <span class="tag t-${r.platform.toLowerCase()}">${r.platform}</span>
+                <span class="tag t-info">👤 ${r.persons}</span>
+                <span class="tag t-info">📅 ${d}j</span>
+                ${r.cleaning?`<span class="tag t-clean">🧹 ${r.cleaning}</span>`:''}
+                ${r.amount?`<span class="tag" style="background:var(--orange-bg);color:#92400e">${r.amount}€</span>`:''}
+            </div>
+        </div>`;
+    }).join(''):'<div style="text-align:center;padding:40px;color:var(--g)">Aucune réservation</div>';
+}
+
+// ===== DETAIL =====
+function showDet(id){
+    const r=D.reservations.find(x=>x.id===id);if(!r)return;
+    const d=dys(r.startDate,r.endDate);
+    let sms='';
+    if(r.cleaning==='Laetitia'){
+        const msg=smsMsg(r),ph=CT.laetitia.phone;
+        sms=`<div style="margin-top:14px;padding:14px;background:var(--purple-bg);border-radius:var(--r)">
+            <div style="font-weight:700;font-size:0.85rem;margin-bottom:8px">📱 Prévenir Laetitia</div>
+            <div style="background:rgba(255,255,255,0.6);padding:10px;border-radius:8px;font-size:0.82rem;white-space:pre-line;margin-bottom:10px">${msg}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn btn-sm btn-out" onclick="cpTxt(\`${msg.replace(/`/g,'\\`')}\`)">📋 Copier</button>
+                ${ph?`<button class="btn btn-sm" style="background:#25D366;color:white" onclick="window.open('https://wa.me/${ph.replace(/[^0-9+]/g,'')}?text=${encodeURIComponent(msg)}')">WhatsApp</button>
+                <button class="btn btn-sm btn-out" onclick="window.open('sms:${ph}?body=${encodeURIComponent(msg)}')">📱 SMS</button>`
+                :'<span style="font-size:0.72rem;color:var(--g)">Ajoutez le n° dans Réglages</span>'}
+            </div>
+        </div>`;
+    }
+    document.getElementById('detBody').innerHTML=`
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+            <span class="tag t-${r.property}" style="font-size:0.82rem;padding:5px 14px">${pnm(r.property)}</span>
+            <span class="tag t-${r.platform.toLowerCase()}" style="font-size:0.82rem;padding:5px 14px">${r.platform}</span>
+        </div>
+        <div style="font-size:1.25rem;font-weight:800;margin-bottom:16px">${r.guestName}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div><div style="font-size:0.72rem;color:var(--g);font-weight:600">Arrivée</div><div style="font-weight:700;font-size:0.95rem">${fd(r.startDate)}</div></div>
+            <div><div style="font-size:0.72rem;color:var(--g);font-weight:600">Départ</div><div style="font-weight:700;font-size:0.95rem">${fd(r.endDate)}</div></div>
+            <div><div style="font-size:0.72rem;color:var(--g);font-weight:600">Personnes</div><div style="font-weight:700;font-size:0.95rem">${r.persons}</div></div>
+            <div><div style="font-size:0.72rem;color:var(--g);font-weight:600">Durée</div><div style="font-weight:700;font-size:0.95rem">${d} jour${d>1?'s':''}</div></div>
+            <div><div style="font-size:0.72rem;color:var(--g);font-weight:600">Ménage</div><div style="font-weight:700;font-size:0.95rem">${r.cleaning||'—'}</div></div>
+            <div><div style="font-size:0.72rem;color:var(--g);font-weight:600">Montant</div><div style="font-weight:700;font-size:0.95rem">${r.amount?r.amount+'€':'—'}</div></div>
+        </div>
+        ${r.notes?`<div style="margin-top:14px;padding:10px;background:var(--gl);border-radius:var(--r);font-size:0.85rem"><b>Notes :</b> ${r.notes}</div>`:''}
+        ${sms}
+    `;
+    document.getElementById('detFoot').innerHTML=`
+        <button class="btn btn-out" style="flex:1" onclick="closeSheet('shDetail')">Fermer</button>
+        <button class="btn btn-blue" style="flex:1" onclick="closeSheet('shDetail');openForm('${id}')">✏️ Modifier</button>
+    `;
+    document.getElementById('shDetail').classList.add('on');
+}
+
+function smsMsg(r){
+    return `Bonjour Laetitia,\nMénage prévu pour ${pnm(r.property)} :\n📅 ${fd(r.startDate)}\n👤 ${r.guestName} — ${r.persons} personnes\nMerci de confirmer par OK.\nBonne journée !`;
+}
+function smsLae(id){
+    const r=D.reservations.find(x=>x.id===id);if(!r)return;
+    const msg=smsMsg(r),ph=CT.laetitia.phone;
+    if(ph)window.open('sms:'+ph+'?body='+encodeURIComponent(msg));
+    else{cpTxt(msg);toast('Message copié — ajoutez le n° dans Réglages','ok');}
+}
+
+// ===== FORM =====
+function openForm(id){
+    if(id){
+        const r=D.reservations.find(x=>x.id===id);if(!r)return;
+        document.getElementById('fTitle').textContent='Modifier';
+        document.getElementById('fDel').style.display='inline-flex';
+        document.getElementById('fId').value=r.id;
+        document.getElementById('fProp').value=r.property;
+        document.getElementById('fPlat').value=r.platform;
+        document.getElementById('fName').value=r.guestName;
+        document.getElementById('fStart').value=r.startDate;
+        document.getElementById('fEnd').value=r.endDate;
+        document.getElementById('fPers').value=r.persons||1;
+        document.getElementById('fAmt').value=r.amount||'';
+        document.getElementById('fClean').value=r.cleaning||'';
+        document.getElementById('fNotes').value=r.notes||'';
+    }else{
+        document.getElementById('fTitle').textContent='Nouvelle réservation';
+        document.getElementById('fDel').style.display='none';
+        ['fId','fName','fNotes'].forEach(x=>document.getElementById(x).value='');
+        document.getElementById('fProp').value='sp';document.getElementById('fPlat').value='AIRBNB';
+        document.getElementById('fStart').value='';document.getElementById('fEnd').value='';
+        document.getElementById('fPers').value=1;document.getElementById('fAmt').value='';
+        document.getElementById('fClean').value='';
+    }
+    document.getElementById('shForm').classList.add('on');
+}
+function saveR(){
+    const n=document.getElementById('fName').value.trim(),s=document.getElementById('fStart').value,e=document.getElementById('fEnd').value;
+    if(!n||!s||!e){toast('Remplir les champs obligatoires','err');return;}
+    if(pd(e)<=pd(s)){toast('Départ doit être après arrivée','err');return;}
+    const data={property:document.getElementById('fProp').value,platform:document.getElementById('fPlat').value,guestName:n,startDate:s,endDate:e,persons:parseInt(document.getElementById('fPers').value)||1,amount:parseFloat(document.getElementById('fAmt').value)||0,cleaning:document.getElementById('fClean').value,notes:document.getElementById('fNotes').value.trim()};
+    const eid=document.getElementById('fId').value;
+    if(eid){const i=D.reservations.findIndex(r=>r.id===eid);if(i>=0){D.reservations[i]={...D.reservations[i],...data};toast('Modifié','ok');}}
+    else{data.id=uid();data.createdAt=new Date().toISOString();D.reservations.push(data);toast('Ajouté','ok');}
+    sv();closeSheet('shForm');
+}
+function delR(){
+    const id=document.getElementById('fId').value,r=D.reservations.find(x=>x.id===id);
+    if(!r||!confirm(`Supprimer ${r.guestName} ?`))return;
+    D.reservations=D.reservations.filter(x=>x.id!==id);sv();closeSheet('shForm');toast('Supprimé','ok');
+}
+
+// ===== SETTINGS =====
+function renderSet(){
+    // Codes
+    let ca='';
+    ['sp','pn'].forEach(pid=>{
+        const p=D.properties[pid];
+        const msg=`Bonjour ! Voici les infos pour ${p.name} :\n${p.wifi?'📶 WiFi : '+p.wifi+'\n':''}${p.keyBox?'🔑 Boîte à clés : '+p.keyBox+'\n':''}Bon séjour !`;
+        ca+=`<div class="code-card ${pid}">
+            <h3>${p.name}</h3>
+            <div class="code-row"><div><div class="code-lbl">📶 WiFi</div><div class="code-val">${p.wifi||'—'}</div></div><div style="display:flex;gap:4px"><button class="code-copy" onclick="cpTxt('${p.wifi||''}')">📋</button><button class="code-copy" onclick="editCode('${pid}','wifi')">✏️</button></div></div>
+            <div class="code-row"><div><div class="code-lbl">🔑 Boîte à clés</div><div class="code-val">${p.keyBox||'—'}</div></div><div style="display:flex;gap:4px"><button class="code-copy" onclick="cpTxt('${p.keyBox||''}')">📋</button><button class="code-copy" onclick="editCode('${pid}','keyBox')">✏️</button></div></div>
+            <div class="share-block"><pre>${msg}</pre><div class="share-row">
+                <button class="sbtn sbtn-copy" onclick="cpTxt(\`${msg.replace(/`/g,'\\`')}\`)">📋 Copier</button>
+                <button class="sbtn sbtn-wa" onclick="window.open('https://wa.me/?text=${encodeURIComponent(msg)}')">WhatsApp</button>
+                <button class="sbtn sbtn-sms" onclick="window.open('sms:?body=${encodeURIComponent(msg)}')">📱 SMS</button>
+            </div></div>
+        </div>`;
+    });
+    document.getElementById('codesArea').innerHTML=ca;
+
+    // Contacts
+    let ct='';
+    for(const[k,c]of Object.entries(CT)){
+        ct+=`<div class="ct"><div class="ct-av" style="background:${c.color}">${c.name[0]}</div><div class="ct-info"><div class="ct-name">${c.name}</div><div class="ct-role">${c.role}</div><div class="ct-phone">${c.phone||'Pas de numéro'}</div></div><button class="ct-edit" onclick="editCt('${k}')">✏️</button></div>`;
+    }
+    document.getElementById('ctArea').innerHTML=ct;
+}
+function editCode(pid,type){
+    const p=D.properties[pid],lbl=type==='wifi'?'WiFi':'boîte à clés';
+    const v=prompt(`Code ${lbl} — ${p.name} :`,type==='wifi'?p.wifi:p.keyBox);
+    if(v!==null){if(type==='wifi')p.wifi=v.trim();else p.keyBox=v.trim();sv();toast('Code mis à jour','ok');}
+}
+function editCt(k){
+    const c=CT[k],ph=prompt(`Numéro de ${c.name} (format +33...) :`,c.phone||'');
+    if(ph!==null){c.phone=ph.trim();svC();renderSet();toast(`${c.name} mis à jour`,'ok');}
+}
+function cpTxt(t){
+    if(!t){toast('Rien à copier','err');return;}
+    navigator.clipboard.writeText(t).then(()=>toast('Copié !','ok')).catch(()=>{
+        const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);toast('Copié !','ok');
+    });
+}
+
+// ===== EXPORTS =====
+function expJSON(){
+    const b=new Blob([JSON.stringify({...D,contacts:CT},null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='locations-data.json';a.click();
+    dirty=false;document.getElementById('uDot').style.display='none';toast('Sauvegardé','ok');
+}
+function impJSON(e){
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();r.onload=function(ev){
+        try{const imp=JSON.parse(ev.target.result);if(!imp.reservations)throw new Error('Format invalide');
+        const ids=new Set(D.reservations.map(r=>r.id));
+        imp.reservations.forEach(r=>{if(ids.has(r.id)){const i=D.reservations.findIndex(x=>x.id===r.id);if(i>=0)D.reservations[i]=r;}else D.reservations.push(r);});
+        if(imp.properties){if(imp.properties.sp)D.properties.sp=imp.properties.sp;if(imp.properties.pn)D.properties.pn=imp.properties.pn;}
+        if(imp.contacts){CT=imp.contacts;svC();}
+        sv();toast(`${imp.reservations.length} réservations importées`,'ok');
+        }catch(err){toast('Erreur : '+err.message,'err');}
+    };r.readAsText(f);e.target.value='';
+}
+function expCSV(){
+    const B='\uFEFF',sep=';';
+    let c=B+['Propriété','Arrivée','Départ','Locataire','Plateforme','Personnes','Jours','Ménage','Montant','Notes'].join(sep)+'\n';
+    [...D.reservations].sort((a,b)=>pd(a.startDate)-pd(b.startDate)).forEach(r=>{
+        c+=[pnm(r.property),fd(r.startDate),fd(r.endDate),'"'+(r.guestName||'').replace(/"/g,'""')+'"',r.platform,r.persons||'',dys(r.startDate,r.endDate),r.cleaning||'',r.amount||'','"'+(r.notes||'').replace(/"/g,'""')+'"'].join(sep)+'\n';
+    });
+    const b=new Blob([c],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='Locations_'+new Date().toISOString().slice(0,10)+'.csv';a.click();toast('CSV téléchargé','ok');
+}
+
+// ===== SHEETS =====
+function closeSheet(id){document.getElementById(id).classList.remove('on');}
+function openMenu(){document.getElementById('shMenu').classList.add('on');}
+['shForm','shDetail','shMenu'].forEach(id=>{document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('on');});});
+
+// ===== REFRESH =====
+function refresh(){renderHome();renderCal();renderRes();renderSet();}
+
+// ===== KEYS =====
+document.addEventListener('keydown',e=>{
+    if(e.key==='Escape')document.querySelectorAll('.sheet-bg.on').forEach(m=>m.classList.remove('on'));
+    if(e.ctrlKey&&e.key==='s'){e.preventDefault();expJSON();}
+    if(e.ctrlKey&&e.key==='n'){e.preventDefault();openForm();}
+});
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
+
+// ===== SERVICE WORKER (PWA) =====
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
+
+// ===== INIT =====
+ld();ldC();refresh();
+</script>
+</body>
+</html>
