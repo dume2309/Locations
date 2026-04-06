@@ -703,6 +703,15 @@ function renderCal(){
         h+='</div>';
     }
     g.innerHTML=h;
+    // Message si mois vide
+    if(!rs.length){
+        g.insertAdjacentHTML('afterend',`<div id="calEmpty" style="text-align:center;padding:20px;color:var(--g);font-size:0.88rem">
+            Aucune réservation ce mois<br>
+            <button class="btn btn-blue btn-sm" style="margin-top:8px" onclick="initCalMonth();renderCal()">📅 Voir les réservations</button>
+        </div>`);
+    } else {
+        const old=document.getElementById('calEmpty');if(old)old.remove();
+    }
 }
 function calClick(di){const dr=D.reservations.filter(r=>inR(di,r.startDate,r.endDate));if(dr.length)showDet(dr[0].id);}
 
