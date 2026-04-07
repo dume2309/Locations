@@ -1038,12 +1038,13 @@ function showDet(id){
     document.getElementById('shDetail').classList.add('on');
 }
 
+function msgName(pid){return pid==='sp'?'Santo Pietro Villa Pleine Campagne':'Pietranera Maison Cosy';}
 function smsMsg(r){
-    return `Bonjour Laetitia,\nMénage prévu pour ${pnm(r.property)} :\n📅 ${fd(r.startDate)}\n👤 ${r.guestName} — ${r.persons} personnes\nMerci de confirmer par OK.\nBonne journée !`;
+    return `Bonjour Laetitia,\nMénage prévu pour ${msgName(r.property)} :\n📅 ${fd(r.startDate)}\n👤 ${r.guestName} — ${r.persons} personnes\nMerci de confirmer par OK.\nBonne journée !`;
 }
 function guestMsg(r){
     const p=D.properties[r.property];
-    return `Bonjour,\nVoici les infos pour ${p.name} :\n${p.wifi?'📶 WiFi : '+p.wifi+'\n':''}${p.keyBox?'🔑 Boîte à clés : '+p.keyBox+'\n':''}📅 Arrivée : ${fd(r.startDate)}\n📅 Départ : ${fd(r.endDate)}\nBon séjour !`;
+    return `Bonjour,\nVoici les infos pour ${msgName(r.property)} :\n${p.wifi?'📶 WiFi : '+p.wifi+'\n':''}${p.keyBox?'🔑 Boîte à clés : '+p.keyBox+'\n':''}📅 Arrivée : ${fd(r.startDate)}\n📅 Départ : ${fd(r.endDate)}\nBon séjour !`;
 }
 function smsLae(id){
     const r=D.reservations.find(x=>x.id===id);if(!r)return;
@@ -1164,7 +1165,7 @@ function renderSet(){
     let ca='';
     ['sp','pn'].forEach(pid=>{
         const p=D.properties[pid];
-        const msg=`Bonjour ! Voici les infos pour ${p.name} :\n${p.wifi?'📶 WiFi : '+p.wifi+'\n':''}${p.keyBox?'🔑 Boîte à clés : '+p.keyBox+'\n':''}Bon séjour !`;
+        const msg=`Bonjour ! Voici les infos pour ${msgName(pid)} :\n${p.wifi?'📶 WiFi : '+p.wifi+'\n':''}${p.keyBox?'🔑 Boîte à clés : '+p.keyBox+'\n':''}Bon séjour !`;
         ca+=`<div class="code-card ${pid}">
             <h3>${p.name}</h3>
             <div class="code-row"><div><div class="code-lbl">📶 WiFi</div><div class="code-val">${p.wifi||'—'}</div></div><div style="display:flex;gap:4px"><button class="code-copy" onclick="cpTxt('${p.wifi||''}')">📋</button><button class="code-copy" onclick="editCode('${pid}','wifi')">✏️</button></div></div>
