@@ -101,7 +101,9 @@
       "amount": 0,
       "cleaning": "",
       "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z"
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "phone": "0617044823",
+      "updatedAt": "2026-04-07T07:27:43.689Z"
     },
     {
       "id": "excel_sp_8",
@@ -290,19 +292,19 @@
   "contacts": {
     "laetitia": {
       "name": "Laetitia",
-      "role": "Femme de ménage",
+      "role": "Femme de mÃ©nage",
       "phone": "",
       "color": "#7c3aed"
     },
     "steph": {
       "name": "Steph",
-      "role": "Propriétaire",
+      "role": "PropriÃ©taire",
       "phone": "0616928334",
       "color": "#059669"
     },
     "bea": {
       "name": "Bea",
-      "role": "Propriétaire",
+      "role": "PropriÃ©taire",
       "phone": "",
       "color": "#d97706"
     }
