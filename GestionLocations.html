@@ -442,6 +442,7 @@
         </div>
         <button class="btn btn-blue btn-sm" onclick="openForm()">+ Ajouter</button>
     </div>
+    <div id="resBilan"></div>
     <div id="resList"></div>
 </div>
 
@@ -575,7 +576,10 @@
                 <div class="fd"><label>Propriété</label><select id="fProp"><option value="sp">Santu Pietru</option><option value="pn">Pietranera</option></select></div>
                 <div class="fd"><label>Plateforme</label><select id="fPlat"><option value="AIRBNB">Airbnb</option><option value="HOMEREZ">Homerez</option><option value="PULSE">Pulse</option><option value="DIRECT">Direct</option></select></div>
             </div>
-            <div class="fd"><label>Nom du locataire</label><input type="text" id="fName" placeholder="Nom"></div>
+            <div class="fd-row">
+                <div class="fd" style="flex:2"><label>Nom du locataire</label><input type="text" id="fName" placeholder="Nom"></div>
+                <div class="fd" style="flex:1"><label>📱 Téléphone</label><input type="tel" id="fPhone" placeholder="+33..."></div>
+            </div>
             <div class="fd-row">
                 <div class="fd"><label>Arrivée</label><input type="date" id="fStart"></div>
                 <div class="fd"><label>Départ</label><input type="date" id="fEnd"></div>
@@ -930,6 +934,35 @@ function renderRes(){
     let list=[...D.reservations];
     if(rf!=='all')list=list.filter(r=>r.property===rf);
     list.sort((a,b)=>pd(a.startDate)-pd(b.startDate));
+    // Bilan financier
+    const nbRes=list.length;
+    const totalNuits=list.reduce((s,r)=>s+dys(r.startDate,r.endDate),0);
+    const totalEur=list.reduce((s,r)=>s+(r.amount||0),0);
+    const nbAvecMontant=list.filter(r=>r.amount>0).length;
+    // Par mois
+    const parMois={};
+    list.forEach(r=>{
+        const m=r.startDate.substring(0,7);
+        if(!parMois[m])parMois[m]={nb:0,eur:0,nuits:0};
+        parMois[m].nb++;parMois[m].eur+=(r.amount||0);parMois[m].nuits+=dys(r.startDate,r.endDate);
+    });
+    const moisNoms=['','Janv','Fév','Mars','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc'];
+    let bilanMois=Object.keys(parMois).sort().map(m=>{
+        const pm=parMois[m];const mi=parseInt(m.split('-')[1]);
+        return `<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:0.78rem;border-bottom:1px solid var(--gl)">
+            <span style="font-weight:600">${moisNoms[mi]}</span>
+            <span>${pm.nb} résa${pm.nb>1?'s':''} · ${pm.nuits}j${pm.eur?` · <b>${pm.eur.toFixed(0)}€</b>`:''}</span>
+        </div>`;
+    }).join('');
+    document.getElementById('resBilan').innerHTML=`
+        <div class="card" style="margin-bottom:12px">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;margin-bottom:10px">
+                <div><div style="font-size:1.3rem;font-weight:800">${nbRes}</div><div style="font-size:0.62rem;color:var(--g)">Réservation${nbRes>1?'s':''}</div></div>
+                <div><div style="font-size:1.3rem;font-weight:800">${totalNuits}</div><div style="font-size:0.62rem;color:var(--g)">Nuitées</div></div>
+                <div><div style="font-size:1.3rem;font-weight:800;color:${totalEur?'var(--green)':'var(--g)'}">${totalEur?totalEur.toFixed(0)+'€':'—'}</div><div style="font-size:0.62rem;color:var(--g)">${nbAvecMontant}/${nbRes} renseigné${nbAvecMontant>1?'s':''}</div></div>
+            </div>
+            ${bilanMois}
+        </div>`;
     document.getElementById('resList').innerHTML=list.length?list.map(r=>{
         const d=dys(r.startDate,r.endDate);
         return `<div class="rc ${r.property}-border" onclick="showDet('${r.id}')">
@@ -969,7 +1002,8 @@ function showDet(id){
             <span class="tag t-${r.property}" style="font-size:0.82rem;padding:5px 14px">${pnm(r.property)}</span>
             <span class="tag t-${r.platform.toLowerCase()}" style="font-size:0.82rem;padding:5px 14px">${r.platform}</span>
         </div>
-        <div style="font-size:1.25rem;font-weight:800;margin-bottom:16px">${r.guestName}</div>
+        <div style="font-size:1.25rem;font-weight:800;margin-bottom:4px">${r.guestName}</div>
+        ${r.phone?`<div style="font-size:0.85rem;color:var(--blue);margin-bottom:12px">📱 ${r.phone}</div>`:'<div style="margin-bottom:12px"></div>'}
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
             <div><div style="font-size:0.72rem;color:var(--g);font-weight:600">Arrivée</div><div style="font-weight:700;font-size:0.95rem">${fd(r.startDate)}</div></div>
             <div><div style="font-size:0.72rem;color:var(--g);font-weight:600">Départ</div><div style="font-weight:700;font-size:0.95rem">${fd(r.endDate)}</div></div>
@@ -979,6 +1013,15 @@ function showDet(id){
             <div><div style="font-size:0.72rem;color:var(--g);font-weight:600">Montant</div><div style="font-weight:700;font-size:0.95rem">${r.amount?r.amount+'€':'—'}</div></div>
         </div>
         ${r.notes?`<div style="margin-top:14px;padding:10px;background:var(--gl);border-radius:var(--r);font-size:0.85rem"><b>Notes :</b> ${r.notes}</div>`:''}
+        ${r.phone?`<div style="margin-top:14px;padding:14px;background:var(--blue-bg);border-radius:var(--r)">
+            <div style="font-weight:700;font-size:0.85rem;margin-bottom:8px">📨 Envoyer les infos à ${r.guestName}</div>
+            <div style="background:rgba(255,255,255,0.6);padding:10px;border-radius:8px;font-size:0.82rem;white-space:pre-line;margin-bottom:10px">${guestMsg(r)}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="btn btn-sm btn-out" onclick="cpTxt(\`${guestMsg(r).replace(/`/g,'\\`')}\`)">📋 Copier</button>
+                <button class="btn btn-sm" style="background:#25D366;color:white" onclick="window.open('https://wa.me/${(r.phone||'').replace(/[^0-9+]/g,'')}?text=${encodeURIComponent(guestMsg(r))}')">WhatsApp</button>
+                <button class="btn btn-sm btn-out" onclick="window.open('sms:${r.phone}?body=${encodeURIComponent(guestMsg(r))}')">📱 SMS</button>
+            </div>
+        </div>`:''}
         ${sms}
     `;
     document.getElementById('detFoot').innerHTML=`
@@ -990,6 +1033,10 @@ function showDet(id){
 
 function smsMsg(r){
     return `Bonjour Laetitia,\nMénage prévu pour ${pnm(r.property)} :\n📅 ${fd(r.startDate)}\n👤 ${r.guestName} — ${r.persons} personnes\nMerci de confirmer par OK.\nBonne journée !`;
+}
+function guestMsg(r){
+    const p=D.properties[r.property];
+    return `Bonjour,\nVoici les infos pour ${p.name} :\n${p.wifi?'📶 WiFi : '+p.wifi+'\n':''}${p.keyBox?'🔑 Boîte à clés : '+p.keyBox+'\n':''}📅 Arrivée : ${fd(r.startDate)}\n📅 Départ : ${fd(r.endDate)}\nBon séjour !`;
 }
 function smsLae(id){
     const r=D.reservations.find(x=>x.id===id);if(!r)return;
@@ -1057,6 +1104,7 @@ function openForm(id){
         document.getElementById('fProp').value=r.property;
         document.getElementById('fPlat').value=r.platform;
         document.getElementById('fName').value=r.guestName;
+        document.getElementById('fPhone').value=r.phone||'';
         document.getElementById('fStart').value=r.startDate;
         document.getElementById('fEnd').value=r.endDate;
         document.getElementById('fPers').value=r.persons||1;
@@ -1066,7 +1114,7 @@ function openForm(id){
     }else{
         document.getElementById('fTitle').textContent='Nouvelle réservation';
         document.getElementById('fDel').style.display='none';
-        ['fId','fName','fNotes'].forEach(x=>document.getElementById(x).value='');
+        ['fId','fName','fPhone','fNotes'].forEach(x=>document.getElementById(x).value='');
         document.getElementById('fProp').value='sp';document.getElementById('fPlat').value='AIRBNB';
         document.getElementById('fStart').value='';document.getElementById('fEnd').value='';
         document.getElementById('fPers').value=1;document.getElementById('fAmt').value='';
@@ -1078,7 +1126,7 @@ function saveR(){
     const n=document.getElementById('fName').value.trim(),s=document.getElementById('fStart').value,e=document.getElementById('fEnd').value;
     if(!n||!s||!e){toast('Remplir les champs obligatoires','err');return;}
     if(pd(e)<=pd(s)){toast('Départ doit être après arrivée','err');return;}
-    const data={property:document.getElementById('fProp').value,platform:document.getElementById('fPlat').value,guestName:n,startDate:s,endDate:e,persons:parseInt(document.getElementById('fPers').value)||1,amount:parseFloat(document.getElementById('fAmt').value)||0,cleaning:document.getElementById('fClean').value,notes:document.getElementById('fNotes').value.trim()};
+    const data={property:document.getElementById('fProp').value,platform:document.getElementById('fPlat').value,guestName:n,phone:document.getElementById('fPhone').value.trim(),startDate:s,endDate:e,persons:parseInt(document.getElementById('fPers').value)||1,amount:parseFloat(document.getElementById('fAmt').value)||0,cleaning:document.getElementById('fClean').value,notes:document.getElementById('fNotes').value.trim()};
     const eid=document.getElementById('fId').value;
     let savedId;
     if(eid){const i=D.reservations.findIndex(r=>r.id===eid);if(i>=0){data.updatedAt=new Date().toISOString();D.reservations[i]={...D.reservations[i],...data};savedId=eid;toast('Modifié','ok');}}
