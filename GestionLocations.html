@@ -681,8 +681,8 @@ async function ghPull(){
                     }
                 });
             }
-            // Contacts — toujours prendre la version distante
-            if(remote.contacts){CT=remote.contacts;svC();}
+            // Contacts — toujours prendre la version distante + réparer
+            if(remote.contacts){CT=remote.contacts;fixContacts();svC();}
             localStorage.setItem(SK,JSON.stringify(D));
             refresh();
         }
@@ -773,13 +773,16 @@ function ld(){
     D=JSON.parse(JSON.stringify(INIT));localStorage.setItem(SK,JSON.stringify(D));
 }
 function ldC(){
-    try{const r=localStorage.getItem(CK);if(r){CT=JSON.parse(r);
-        // Réparer les rôles corrompus (encodage UTF-8)
-        const fix={'laetitia':'Femme de ménage','steph':'Propriétaire','bea':'Propriétaire'};
-        for(const[k,role]of Object.entries(fix)){if(CT[k]&&CT[k].role!==role)CT[k].role=role;}
-        svC();return;
-    }}catch(e){}
+    try{const r=localStorage.getItem(CK);if(r){CT=JSON.parse(r);fixContacts();svC();return;}}catch(e){}
     CT=JSON.parse(JSON.stringify(DEF_CT));localStorage.setItem(CK,JSON.stringify(CT));
+}
+function fixContacts(){
+    const fix={'laetitia':'Femme de ménage','steph':'Propriétaire','bea':'Propriétaire'};
+    for(const[k,role]of Object.entries(fix)){
+        if(CT[k]&&(CT[k].role!==role||/Ã|Â/.test(CT[k].role))){
+            CT[k].role=role;
+        }
+    }
 }
 function sv(){localStorage.setItem(SK,JSON.stringify(D));dirty=true;document.getElementById('uDot').style.display='block';refresh();ghPush();}
 function svC(){localStorage.setItem(CK,JSON.stringify(CT));}
