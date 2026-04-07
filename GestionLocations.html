@@ -673,17 +673,16 @@ async function ghPull(){
                     }
                 }
             });
-            // Propriétés
+            // Propriétés — toujours prendre la version distante
             if(remote.properties){
                 ['sp','pn'].forEach(pid=>{
                     if(remote.properties[pid]){
-                        if(remote.properties[pid].wifi&&!D.properties[pid].wifi)D.properties[pid].wifi=remote.properties[pid].wifi;
-                        if(remote.properties[pid].keyBox&&!D.properties[pid].keyBox)D.properties[pid].keyBox=remote.properties[pid].keyBox;
+                        D.properties[pid]=remote.properties[pid];
                     }
                 });
             }
-            // Contacts
-            if(remote.contacts){CT={...CT,...remote.contacts};svC();}
+            // Contacts — toujours prendre la version distante
+            if(remote.contacts){CT=remote.contacts;svC();}
             localStorage.setItem(SK,JSON.stringify(D));
             refresh();
         }
@@ -767,7 +766,15 @@ function ld(){
     }}catch(e){}
     D=JSON.parse(JSON.stringify(INIT));localStorage.setItem(SK,JSON.stringify(D));
 }
-function ldC(){try{const r=localStorage.getItem(CK);if(r){CT=JSON.parse(r);return;}}catch(e){}CT=JSON.parse(JSON.stringify(DEF_CT));localStorage.setItem(CK,JSON.stringify(CT));}
+function ldC(){
+    try{const r=localStorage.getItem(CK);if(r){CT=JSON.parse(r);
+        // Réparer les rôles corrompus (encodage UTF-8)
+        const fix={'laetitia':'Femme de ménage','steph':'Propriétaire','bea':'Propriétaire'};
+        for(const[k,role]of Object.entries(fix)){if(CT[k]&&CT[k].role!==role)CT[k].role=role;}
+        svC();return;
+    }}catch(e){}
+    CT=JSON.parse(JSON.stringify(DEF_CT));localStorage.setItem(CK,JSON.stringify(CT));
+}
 function sv(){localStorage.setItem(SK,JSON.stringify(D));dirty=true;document.getElementById('uDot').style.display='block';refresh();ghPush();}
 function svC(){localStorage.setItem(CK,JSON.stringify(CT));}
 
