@@ -655,24 +655,24 @@ async function ghPull(){
         ghSha=json.sha;
         const raw=atob(json.content.replace(/\n/g,''));
         const remote=JSON.parse(raw);
-        // Fusionner : si les données distantes sont plus récentes ou ont plus de résas
+        // Fusionner les réservations avec la version distante
         if(remote.reservations){
-            // Merge intelligent : garder les résas des 2 côtés
-            const localIds=new Set(D.reservations.map(r=>r.id));
             const remoteIds=new Set(remote.reservations.map(r=>r.id));
-            // Ajouter les résas distantes qu'on n'a pas localement
-            remote.reservations.forEach(r=>{
-                if(!localIds.has(r.id)){D.reservations.push(r);}
-                else{
-                    // Mettre à jour si la version distante est plus récente
-                    const li=D.reservations.findIndex(x=>x.id===r.id);
-                    if(li>=0){
-                        const lUp=D.reservations[li].updatedAt||D.reservations[li].createdAt||'';
-                        const rUp=r.updatedAt||r.createdAt||'';
-                        if(rUp>lUp)D.reservations[li]=r;
-                    }
+            // Prendre la base distante, puis mettre à jour avec les locales plus récentes
+            const merged=remote.reservations.map(r=>{
+                const local=D.reservations.find(x=>x.id===r.id);
+                if(local){
+                    const lUp=local.updatedAt||local.createdAt||'';
+                    const rUp=r.updatedAt||r.createdAt||'';
+                    return lUp>rUp?local:r;
                 }
+                return r;
             });
+            // Ajouter les résas locales qui n'existent pas côté distant (créées hors ligne)
+            D.reservations.forEach(r=>{
+                if(!remoteIds.has(r.id))merged.push(r);
+            });
+            D.reservations=merged;
             // Propriétés — toujours prendre la version distante
             if(remote.properties){
                 ['sp','pn'].forEach(pid=>{
@@ -708,7 +708,7 @@ async function ghPush(){
             if(res.ok){const j=await res.json();ghSha=j.sha;}
         }
         const data={...D,contacts:CT};
-        const content=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
+        const content=utf8ToBase64(JSON.stringify(data,null,2));
         const body={message:'Sync données locations',content:content};
         if(ghSha)body.sha=ghSha;
         const res=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`,{
@@ -736,6 +736,12 @@ async function ghPush(){
     syncing=false;
 }
 
+function utf8ToBase64(str){
+    const bytes=new TextEncoder().encode(str);
+    let binary='';
+    bytes.forEach(b=>binary+=String.fromCharCode(b));
+    return btoa(binary);
+}
 function syncStatus(s){
     const el=document.getElementById('syncInd');if(!el)return;
     if(s==='pull'){el.textContent='🔄';el.title='Synchronisation...';}
@@ -924,13 +930,12 @@ function renderCal(){
     }
     g.innerHTML=h;
     // Message si mois vide
+    const old=document.getElementById('calEmpty');if(old)old.remove();
     if(!rs.length){
         g.insertAdjacentHTML('afterend',`<div id="calEmpty" style="text-align:center;padding:20px;color:var(--g);font-size:0.88rem">
             Aucune réservation ce mois<br>
             <button class="btn btn-blue btn-sm" style="margin-top:8px" onclick="initCalMonth();renderCal()">📅 Voir les réservations</button>
         </div>`);
-    } else {
-        const old=document.getElementById('calEmpty');if(old)old.remove();
     }
 }
 function calClick(di){const dr=D.reservations.filter(r=>inR(di,r.startDate,r.endDate));if(dr.length)showDet(dr[0].id);}
