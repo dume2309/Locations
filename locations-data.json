@@ -21,9 +21,11 @@
       "endDate": "2026-03-30",
       "persons": 9,
       "amount": 0,
-      "cleaning": "",
+      "cleaning": "Laetitia",
       "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z"
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "phone": "",
+      "updatedAt": "2026-04-10T16:05:24.316Z"
     },
     {
       "id": "excel_sp_2",
