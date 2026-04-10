@@ -279,6 +279,20 @@
       "cleaning": "",
       "notes": "",
       "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "property": "pn",
+      "platform": "PULSE",
+      "guestName": "Koichiro yamada",
+      "phone": "",
+      "startDate": "2026-07-10",
+      "endDate": "2026-07-12",
+      "persons": 4,
+      "amount": 0,
+      "cleaning": "",
+      "notes": "",
+      "id": "mnt44la9tsqkk",
+      "createdAt": "2026-04-10T16:20:55.617Z"
     }
   ],
   "version": 1,
