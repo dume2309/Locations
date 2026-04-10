@@ -292,6 +292,20 @@
       "cleaning": "",
       "notes": "",
       "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "property": "sp",
+      "platform": "AIRBNB",
+      "guestName": "Essai",
+      "phone": "0623456890",
+      "startDate": "2026-04-16",
+      "endDate": "2026-04-18",
+      "persons": 1,
+      "amount": 7000,
+      "cleaning": "Laetitia",
+      "notes": "",
+      "id": "mnt3mr82qdk9n",
+      "createdAt": "2026-04-10T16:07:03.506Z"
     }
   ],
   "version": 1,
