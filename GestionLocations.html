@@ -534,7 +534,7 @@
             </div>
         </div>
 
-        <div style="text-align:center;font-size:0.72rem;color:var(--g);padding:16px 0 8px">Locations v1.4</div>
+        <div style="text-align:center;font-size:0.72rem;color:var(--g);padding:16px 0 8px">Locations v1.5</div>
         <div class="sec-title" style="cursor:pointer;user-select:none" onclick="promptAdmin()">🔒 Admin</div>
         <div id="adminArea" style="display:none">
             <div class="card">
@@ -642,7 +642,9 @@ const _GK=_P.join('');
 const GH_TOKEN=(()=>{try{const t=localStorage.getItem('loc_gh_token');return t?atob(t):atob(_GK);}catch(e){return atob(_GK);}})();
 const GH_REPO='dume2309/Locations';
 const GH_FILE='locations-data.json';
+const GH_TXT_FILE='locations-backup.txt';
 let ghSha=null; // SHA du fichier sur GitHub (nécessaire pour l'update)
+let ghTxtSha=null; // SHA du backup TXT
 let syncing=false;
 
 async function ghPull(){
@@ -752,11 +754,39 @@ async function ghPush(){
         ghSha=j.content.sha;
         dirty=false;document.getElementById('uDot').style.display='none';
         syncStatus('ok');
+        // Push backup TXT en parallele (non bloquant : si ca echoue, le JSON est deja safe)
+        ghPushTxt().catch(e=>console.warn('ghPushTxt:',e));
     }catch(e){
         console.error('ghPush:',e);
         syncStatus('err');
     }
     syncing=false;
+}
+
+async function ghPushTxt(){
+    try{
+        // Recuperer le SHA actuel du backup TXT (peut ne pas exister la premiere fois)
+        if(!ghTxtSha){
+            const res=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_TXT_FILE}`,{
+                headers:{'Authorization':`Bearer ${GH_TOKEN}`,'Accept':'application/vnd.github.v3+json'}
+            });
+            if(res.ok){const j=await res.json();ghTxtSha=j.sha;}
+        }
+        const txt=genBackupTxt();
+        const content=utf8ToBase64(txt);
+        const body={message:'Backup TXT auto',content:content};
+        if(ghTxtSha)body.sha=ghTxtSha;
+        const res=await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_TXT_FILE}`,{
+            method:'PUT',
+            headers:{'Authorization':`Bearer ${GH_TOKEN}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+            body:JSON.stringify(body)
+        });
+        if(res.ok){const j=await res.json();ghTxtSha=j.content.sha;}
+        else if(res.status===409||res.status===422){
+            // Conflit : on relache le SHA et on reessaiera au prochain push
+            ghTxtSha=null;
+        }
+    }catch(e){console.warn('ghPushTxt erreur silencieuse:',e);}
 }
 
 function utf8ToBase64(str){
