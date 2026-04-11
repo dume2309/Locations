@@ -534,7 +534,7 @@
             </div>
         </div>
 
-        <div style="text-align:center;font-size:0.72rem;color:var(--g);padding:16px 0 8px">Locations v1.2</div>
+        <div style="text-align:center;font-size:0.72rem;color:var(--g);padding:16px 0 8px">Locations v1.3</div>
         <div class="sec-title" style="cursor:pointer;user-select:none" onclick="promptAdmin()">🔒 Admin</div>
         <div id="adminArea" style="display:none">
             <div class="card">
@@ -682,8 +682,18 @@ async function ghPull(){
                     }
                 });
             }
-            // Contacts — toujours prendre la version distante + réparer
-            if(remote.contacts){CT=remote.contacts;fixContacts();svC();}
+            // Contacts — merge intelligent : ne JAMAIS écraser un numéro local par un vide distant
+            if(remote.contacts){
+                Object.keys(remote.contacts).forEach(k=>{
+                    const r=remote.contacts[k], l=CT[k];
+                    if(!l){CT[k]=r;return;}
+                    // Si local a un numéro et distant ne l'a pas → garder local (anti-perte)
+                    if(l.phone && !r.phone){return;}
+                    // Sinon merge : champs distants priment, mais on conserve le phone local s'il existe et le distant est vide
+                    CT[k]={...l,...r,phone:r.phone||l.phone||''};
+                });
+                fixContacts();svC();
+            }
             localStorage.setItem(SK,JSON.stringify(D));
             refresh();
         }
@@ -786,7 +796,7 @@ function fixContacts(){
     }
 }
 function sv(){localStorage.setItem(SK,JSON.stringify(D));dirty=true;document.getElementById('uDot').style.display='block';refresh();ghPush();}
-function svC(){localStorage.setItem(CK,JSON.stringify(CT));}
+function svC(){localStorage.setItem(CK,JSON.stringify(CT));dirty=true;const d=document.getElementById('uDot');if(d)d.style.display='block';ghPush();}
 
 // Helpers
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
