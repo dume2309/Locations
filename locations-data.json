@@ -306,24 +306,12 @@
       "notes": "",
       "id": "mnt44la9tsqkk",
       "createdAt": "2026-04-10T16:20:55.617Z"
-    },
-    {
-      "property": "sp",
-      "platform": "AIRBNB",
-      "guestName": "Essai",
-      "phone": "",
-      "startDate": "2026-04-28",
-      "endDate": "2026-04-30",
-      "persons": 1,
-      "amount": 0,
-      "cleaning": "",
-      "notes": "",
-      "id": "mnu7aapk0k8gy",
-      "createdAt": "2026-04-11T10:37:06.872Z"
     }
   ],
   "version": 1,
-  "deletedIds": [],
+  "deletedIds": [
+    "mnu7aapk0k8gy"
+  ],
   "contacts": {
     "laetitia": {
       "name": "Laetitia",
