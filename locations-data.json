@@ -293,6 +293,18 @@
       "notes": "",
       "id": "mnt44la9tsqkk",
       "createdAt": "2026-04-10T16:20:55.617Z"
+    },
+    {
+      "id": "excel_pn_21",
+      "property": "pn",
+      "platform": "PULSE",
+      "guestName": "F-Nardone",
+      "startDate": "2026-08-06",
+      "endDate": "2026-08-11",
+      "persons": 5,
+      "amount": 796.25,
+      "cleaning": "",
+      "notes": ""
     }
   ],
   "version": 1,
