@@ -457,9 +457,6 @@
 
         <div class="sec-title">💾 Données</div>
         <div class="card">
-            <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="expJSON()">💾 Sauvegarder (JSON)</button>
-            <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="document.getElementById('impF').click()">📂 Importer (JSON)</button>
-            <input type="file" id="impF" accept=".json" style="display:none" onchange="impJSON(event)">
             <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="expCSV()">📊 Export Excel (CSV)</button>
             <button class="btn btn-out btn-full" onclick="window.print()">🖨️ Imprimer</button>
         </div>
@@ -616,8 +613,6 @@
         <div class="sheet-bar"></div>
         <div class="sheet-title">Menu</div>
         <div class="sheet-body">
-            <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="expJSON();closeSheet('shMenu')">💾 Sauvegarder</button>
-            <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="document.getElementById('impF').click();closeSheet('shMenu')">📂 Importer</button>
             <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="expCSV();closeSheet('shMenu')">📊 Excel</button>
             <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="closeSheet('shMenu');setTimeout(()=>window.print(),300)">🖨️ Imprimer</button>
             <button class="btn btn-out btn-full" onclick="closeSheet('shMenu')">Fermer</button>
