@@ -2,13 +2,13 @@
   "properties": {
     "sp": {
       "name": "Santu Pietru",
-      "wifi": "Santo MDP : 654390@B",
-      "keyBox": "0311"
+      "wifi": "",
+      "keyBox": ""
     },
     "pn": {
       "name": "Pietranera",
-      "wifi": "Freebox_Maison MDP : VillageHouse20",
-      "keyBox": "3611"
+      "wifi": "",
+      "keyBox": ""
     }
   },
   "reservations": [
@@ -21,11 +21,9 @@
       "endDate": "2026-03-30",
       "persons": 9,
       "amount": 0,
-      "cleaning": "Laetitia",
+      "cleaning": "",
       "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z",
-      "phone": "",
-      "updatedAt": "2026-04-10T16:05:24.316Z"
+      "createdAt": "2026-01-01T00:00:00.000Z"
     },
     {
       "id": "excel_sp_2",
@@ -281,20 +279,6 @@
       "createdAt": "2026-01-01T00:00:00.000Z"
     },
     {
-      "property": "pn",
-      "platform": "PULSE",
-      "guestName": "Koichiro yamada",
-      "phone": "",
-      "startDate": "2026-07-10",
-      "endDate": "2026-07-12",
-      "persons": 4,
-      "amount": 0,
-      "cleaning": "",
-      "notes": "",
-      "id": "mnt44la9tsqkk",
-      "createdAt": "2026-04-10T16:20:55.617Z"
-    },
-    {
       "id": "excel_pn_21",
       "property": "pn",
       "platform": "PULSE",
@@ -304,7 +288,8 @@
       "persons": 5,
       "amount": 796.25,
       "cleaning": "",
-      "notes": ""
+      "notes": "",
+      "createdAt": "2026-01-01T00:00:00.000Z"
     }
   ],
   "version": 1,
@@ -313,7 +298,7 @@
     "laetitia": {
       "name": "Laetitia",
       "role": "Femme de ménage",
-      "phone": "0610454891",
+      "phone": "",
       "color": "#7c3aed"
     },
     "steph": {
@@ -325,7 +310,7 @@
     "bea": {
       "name": "Bea",
       "role": "Propriétaire",
-      "phone": "0612473734",
+      "phone": "",
       "color": "#d97706"
     }
   }
