@@ -534,7 +534,7 @@
             </div>
         </div>
 
-        <div style="text-align:center;font-size:0.72rem;color:var(--g);padding:16px 0 8px">Locations v1.3</div>
+        <div style="text-align:center;font-size:0.72rem;color:var(--g);padding:16px 0 8px">Locations v1.4</div>
         <div class="sec-title" style="cursor:pointer;user-select:none" onclick="promptAdmin()">🔒 Admin</div>
         <div id="adminArea" style="display:none">
             <div class="card">
@@ -658,9 +658,16 @@ async function ghPull(){
         const remote=JSON.parse(raw);
         // Fusionner les réservations avec la version distante
         if(remote.reservations){
+            // Tombstones : fusion des suppressions des deux côtés
+            if(!D.deletedIds)D.deletedIds=[];
+            const remoteDel=Array.isArray(remote.deletedIds)?remote.deletedIds:[];
+            remoteDel.forEach(id=>{if(!D.deletedIds.includes(id))D.deletedIds.push(id);});
+            const deletedSet=new Set(D.deletedIds);
+
             const remoteIds=new Set(remote.reservations.map(r=>r.id));
             // Prendre la base distante, puis mettre à jour avec les locales plus récentes
-            const merged=remote.reservations.map(r=>{
+            // Et exclure tout ce qui est dans le set des suppressions
+            const merged=remote.reservations.filter(r=>!deletedSet.has(r.id)).map(r=>{
                 const local=D.reservations.find(x=>x.id===r.id);
                 if(local){
                     const lUp=local.updatedAt||local.createdAt||'';
@@ -671,15 +678,20 @@ async function ghPull(){
             });
             // Ajouter les résas locales qui n'existent pas côté distant (créées hors ligne)
             D.reservations.forEach(r=>{
-                if(!remoteIds.has(r.id))merged.push(r);
+                if(!remoteIds.has(r.id)&&!deletedSet.has(r.id))merged.push(r);
             });
             D.reservations=merged;
-            // Propriétés — toujours prendre la version distante
+            // Propriétés — merge intelligent : ne JAMAIS écraser un champ local rempli par un vide distant
             if(remote.properties){
-                ['sp','pn'].forEach(pid=>{
-                    if(remote.properties[pid]){
-                        D.properties[pid]=remote.properties[pid];
-                    }
+                Object.keys(remote.properties).forEach(pid=>{
+                    const r=remote.properties[pid], l=D.properties[pid];
+                    if(!l){D.properties[pid]=r;return;}
+                    // Merge champ par champ : distant prime, sauf si distant vide et local rempli
+                    D.properties[pid]={
+                        name:r.name||l.name||'',
+                        wifi:r.wifi||l.wifi||'',
+                        keyBox:r.keyBox||l.keyBox||''
+                    };
                 });
             }
             // Contacts — merge intelligent : ne JAMAIS écraser un numéro local par un vide distant
@@ -779,9 +791,9 @@ function ld(){
         if(D.reservations&&D.reservations.length&&D.reservations[0].startDate&&D.reservations[0].startDate.startsWith('2025')){
             D=JSON.parse(JSON.stringify(INIT));localStorage.setItem(SK,JSON.stringify(D));return;
         }
-        if(D.reservations)return;
+        if(D.reservations){if(!Array.isArray(D.deletedIds))D.deletedIds=[];return;}
     }}catch(e){}
-    D=JSON.parse(JSON.stringify(INIT));localStorage.setItem(SK,JSON.stringify(D));
+    D=JSON.parse(JSON.stringify(INIT));if(!D.deletedIds)D.deletedIds=[];localStorage.setItem(SK,JSON.stringify(D));
 }
 function ldC(){
     try{const r=localStorage.getItem(CK);if(r){CT=JSON.parse(r);fixContacts();svC();return;}}catch(e){}
@@ -1175,7 +1187,10 @@ function saveR(){
 function delR(){
     const id=document.getElementById('fId').value,r=D.reservations.find(x=>x.id===id);
     if(!r||!confirm(`Supprimer ${r.guestName} ?`))return;
-    D.reservations=D.reservations.filter(x=>x.id!==id);sv();closeSheet('shForm');toast('Supprimé','ok');
+    D.reservations=D.reservations.filter(x=>x.id!==id);
+    if(!D.deletedIds)D.deletedIds=[];
+    if(!D.deletedIds.includes(id))D.deletedIds.push(id);
+    sv();closeSheet('shForm');toast('Supprimé','ok');
 }
 
 // ===== SETTINGS =====
