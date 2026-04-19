@@ -75,11 +75,9 @@
       "endDate": "2026-04-25",
       "persons": 9,
       "amount": 0,
-      "cleaning": "Laetitia",
+      "cleaning": "",
       "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z",
-      "phone": "",
-      "updatedAt": "2026-04-18T15:03:08.785Z"
+      "createdAt": "2026-01-01T00:00:00.000Z"
     },
     {
       "id": "excel_sp_6",
@@ -90,11 +88,9 @@
       "endDate": "2026-04-30",
       "persons": 6,
       "amount": 0,
-      "cleaning": "Laetitia",
+      "cleaning": "",
       "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z",
-      "phone": "",
-      "updatedAt": "2026-04-18T15:05:03.397Z"
+      "createdAt": "2026-01-01T00:00:00.000Z"
     },
     {
       "id": "excel_sp_7",
