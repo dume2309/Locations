@@ -75,9 +75,11 @@
       "endDate": "2026-04-25",
       "persons": 9,
       "amount": 0,
-      "cleaning": "",
+      "cleaning": "Laetitia",
       "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z"
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "phone": "",
+      "updatedAt": "2026-04-18T15:03:08.785Z"
     },
     {
       "id": "excel_sp_6",
@@ -88,9 +90,11 @@
       "endDate": "2026-04-30",
       "persons": 6,
       "amount": 0,
-      "cleaning": "",
+      "cleaning": "Laetitia",
       "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z"
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "phone": "",
+      "updatedAt": "2026-04-18T15:05:03.397Z"
     },
     {
       "id": "excel_sp_7",
@@ -281,19 +285,6 @@
       "createdAt": "2026-01-01T00:00:00.000Z"
     },
     {
-      "id": "excel_pn_21",
-      "property": "pn",
-      "platform": "PULSE",
-      "guestName": "F-Nardone",
-      "startDate": "2026-08-06",
-      "endDate": "2026-08-11",
-      "persons": 5,
-      "amount": 796.25,
-      "cleaning": "",
-      "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z"
-    },
-    {
       "property": "pn",
       "platform": "PULSE",
       "guestName": "Koichiro yamada",
@@ -310,7 +301,8 @@
   ],
   "version": 1,
   "deletedIds": [
-    "mnu7aapk0k8gy"
+    "mnu7aapk0k8gy",
+    "excel_pn_21"
   ],
   "contacts": {
     "laetitia": {
