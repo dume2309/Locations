@@ -252,9 +252,11 @@
       "endDate": "2026-04-25",
       "persons": 4,
       "amount": 0,
-      "cleaning": "",
+      "cleaning": "Bea / Steph",
       "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z"
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "phone": "",
+      "updatedAt": "2026-04-20T08:16:44.218Z"
     },
     {
       "id": "excel_pn_19",
