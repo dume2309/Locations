@@ -328,6 +328,20 @@
       "notes": "",
       "id": "mo6y019v6ebpn",
       "createdAt": "2026-04-20T08:38:11.829Z"
+    },
+    {
+      "property": "pn",
+      "platform": "PULSE",
+      "guestName": "Nasticka michaela",
+      "phone": "",
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-28",
+      "persons": 5,
+      "amount": 0,
+      "cleaning": "",
+      "notes": "",
+      "id": "mo6yb32s30qms",
+      "createdAt": "2026-04-20T08:46:47.382Z"
     }
   ],
   "version": 1,
