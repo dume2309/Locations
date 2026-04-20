@@ -314,6 +314,20 @@
       "id": "mo67b3g24di1y",
       "createdAt": "2026-04-19T20:10:58.227Z",
       "updatedAt": "2026-04-19T20:11:58.649Z"
+    },
+    {
+      "property": "sp",
+      "platform": "AIRBNB",
+      "guestName": "Sud metal",
+      "phone": "",
+      "startDate": "2026-05-14",
+      "endDate": "2026-05-17",
+      "persons": 3,
+      "amount": 0,
+      "cleaning": "",
+      "notes": "",
+      "id": "mo6y019v6ebpn",
+      "createdAt": "2026-04-20T08:38:11.829Z"
     }
   ],
   "version": 1,
