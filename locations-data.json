@@ -274,19 +274,6 @@
       "updatedAt": "2026-04-07T08:04:26.993Z"
     },
     {
-      "id": "excel_pn_20",
-      "property": "pn",
-      "platform": "PULSE",
-      "guestName": "M-Plachtova",
-      "startDate": "2026-06-29",
-      "endDate": "2026-07-09",
-      "persons": 2,
-      "amount": 1366.9,
-      "cleaning": "",
-      "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z"
-    },
-    {
       "property": "pn",
       "platform": "PULSE",
       "guestName": "Koichiro yamada",
@@ -347,7 +334,8 @@
   "version": 1,
   "deletedIds": [
     "mnu7aapk0k8gy",
-    "excel_pn_21"
+    "excel_pn_21",
+    "excel_pn_20"
   ],
   "contacts": {
     "laetitia": {
