@@ -533,7 +533,7 @@
 
         <div style="text-align:center;padding:16px 0 8px">
             <button class="btn btn-out btn-sm" style="font-size:0.78rem;padding:6px 14px" onclick="forceUpdate()">🔄 Forcer la mise à jour</button>
-            <div style="font-size:0.72rem;color:var(--g);margin-top:8px">Locations v1.7</div>
+            <div style="font-size:0.72rem;color:var(--g);margin-top:8px">Locations v1.8</div>
         </div>
         <div class="sec-title" style="cursor:pointer;user-select:none" onclick="promptAdmin()">🔒 Admin</div>
         <div id="adminArea" style="display:none">
@@ -619,19 +619,6 @@
             <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="expCSV();closeSheet('shMenu')">📊 Excel</button>
             <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="closeSheet('shMenu');setTimeout(()=>window.print(),300)">🖨️ Imprimer</button>
             <button class="btn btn-out btn-full" onclick="closeSheet('shMenu')">Fermer</button>
-        </div>
-    </div>
-</div>
-
-<!-- SHEET : RAPPELS CALENDRIER -->
-<div class="sheet-bg" id="shReminder">
-    <div class="sheet">
-        <div class="sheet-bar"></div>
-        <div class="sheet-title">📅 Rappels calendrier</div>
-        <div class="sheet-body" id="remBody"></div>
-        <div class="sheet-foot">
-            <button class="btn btn-out" style="flex:1" onclick="remDismiss()">❌ Ignorer</button>
-            <button class="btn btn-blue" style="flex:1" onclick="remAck()">✅ Ajouter</button>
         </div>
     </div>
 </div>
@@ -1125,55 +1112,6 @@ function smsLae(id){
     else{cpTxt(msg);toast('Message copié — ajoutez le n° dans Réglages','ok');}
 }
 
-// ===== RAPPEL CALENDRIER (.ics) =====
-function addReminder(id){
-    const r=D.reservations.find(x=>x.id===id);if(!r)return;
-    const prop=pnm(r.property);
-    const who=r.cleaning||'équipe';
-    const summary=`Prévenir ${who} — ménage ${prop}`;
-    const desc=`Ménage avant arrivée de ${r.guestName} (${r.persons} pers.)\\n${prop} — ${r.platform}\\nPenser à envoyer le SMS !`;
-    // Veille du check-in à 9h
-    const s=pd(r.startDate);
-    s.setDate(s.getDate()-1);
-    const dtStart=icsDate(s,9,0);
-    const dtEnd=icsDate(s,9,30);
-    const now=icsDate(new Date());
-    const uid=r.id+'@locations';
-    const ics=[
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//Locations//FR',
-        'CALSCALE:GREGORIAN',
-        'BEGIN:VEVENT',
-        'UID:'+uid,
-        'DTSTAMP:'+now,
-        'DTSTART:'+dtStart,
-        'DTEND:'+dtEnd,
-        'SUMMARY:'+summary,
-        'DESCRIPTION:'+desc,
-        'BEGIN:VALARM',
-        'TRIGGER:-PT0M',
-        'ACTION:DISPLAY',
-        'DESCRIPTION:'+summary,
-        'END:VALARM',
-        'END:VEVENT',
-        'END:VCALENDAR'
-    ].join('\r\n');
-    const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');
-    a.href=url;a.download=`rappel_${r.guestName.replace(/\s+/g,'_')}.ics`;
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast('Rappel téléchargé — ouvrez-le pour l\'ajouter au calendrier','ok');
-}
-function icsDate(d,h,m){
-    const dt=new Date(d);
-    if(h!==undefined){dt.setHours(h,m||0,0,0);}
-    const p=n=>String(n).padStart(2,'0');
-    return dt.getFullYear()+p(dt.getMonth()+1)+p(dt.getDate())+'T'+p(dt.getHours())+p(dt.getMinutes())+'00';
-}
-
 // ===== FORM =====
 function openForm(id){
     if(id){
@@ -1402,59 +1340,12 @@ async function forceUpdate(){
     }catch(e){location.reload(true);}
 }
 
-// ===== RAPPELS AUTO =====
-// Format v2 : objet {id: 'yes'|'no'} pour distinguer accepte vs refuse (tous les 2 = traite)
-// Migration auto depuis l'ancien format array (tout ID stocke = considere comme 'yes')
-const RK='loc_reminded_v2';
-function getReminded(){
-    try{
-        const raw=localStorage.getItem(RK);
-        if(raw){const o=JSON.parse(raw);if(o&&typeof o==='object'&&!Array.isArray(o))return o;}
-        // Migration de l'ancien format
-        const old=localStorage.getItem('loc_reminded');
-        if(old){const arr=JSON.parse(old);if(Array.isArray(arr)){const o={};arr.forEach(id=>o[id]='yes');localStorage.setItem(RK,JSON.stringify(o));return o;}}
-    }catch(e){}
-    return {};
-}
-function setRemindedState(id,state){const o=getReminded();o[id]=state;localStorage.setItem(RK,JSON.stringify(o));}
-
-let _remPending=[]; // liste des resas en cours dans la popup
-function checkPendingReminders(){
-    const reminded=getReminded();
-    const now=new Date();
-    _remPending=D.reservations.filter(r=>r.cleaning && pd(r.startDate)>now && !reminded[r.id]);
-    if(!_remPending.length)return;
-    const names=_remPending.map(r=>`<div style="padding:8px 10px;background:var(--gl);border-radius:8px;margin-bottom:6px;font-size:0.85rem"><b>${r.guestName}</b> <span style="color:var(--g)">— ${pnm(r.property)}</span><br><span style="font-size:0.78rem;color:var(--g)">🧹 ${r.cleaning} · Arrivée ${fd(r.startDate)}</span></div>`).join('');
-    document.getElementById('remBody').innerHTML=`
-        <div style="font-size:0.88rem;margin-bottom:12px">
-            <b>${_remPending.length} réservation${_remPending.length>1?'s':''}</b> sans rappel calendrier sur cet appareil :
-        </div>
-        ${names}
-        <div style="font-size:0.78rem;color:var(--g);margin-top:10px;text-align:center">
-            ✅ ajoute les rappels au calendrier de cet appareil<br>
-            ❌ marque comme ignoré (plus de notification)
-        </div>
-    `;
-    document.getElementById('shReminder').classList.add('on');
-}
-function remAck(){
-    _remPending.forEach((r,i)=>{setTimeout(()=>addReminder(r.id),i*500);});
-    _remPending.forEach(r=>setRemindedState(r.id,'yes'));
-    _remPending=[];
-    closeSheet('shReminder');
-    toast('Rappels ajoutés','ok');
-}
-function remDismiss(){
-    _remPending.forEach(r=>setRemindedState(r.id,'no'));
-    _remPending=[];
-    closeSheet('shReminder');
-    toast('Rappels ignorés','ok');
-}
+// (Rappels calendrier .ics retires en v1.8 - la timeline d'accueil de l'appli suffit)
 
 // ===== INIT =====
 ld();ldC();initCalMonth();refresh();
 // Synchro GitHub au démarrage puis rappels
-ghPull().then(()=>{refresh();setTimeout(checkPendingReminders,1000);});
+ghPull().then(()=>refresh());
 </script>
 </body>
 </html>
