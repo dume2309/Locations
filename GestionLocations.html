@@ -620,6 +620,19 @@
     </div>
 </div>
 
+<!-- SHEET : RAPPELS CALENDRIER -->
+<div class="sheet-bg" id="shReminder">
+    <div class="sheet">
+        <div class="sheet-bar"></div>
+        <div class="sheet-title">📅 Rappels calendrier</div>
+        <div class="sheet-body" id="remBody"></div>
+        <div class="sheet-foot">
+            <button class="btn btn-out" style="flex:1" onclick="remDismiss()">❌ Ignorer</button>
+            <button class="btn btn-blue" style="flex:1" onclick="remAck()">✅ Ajouter</button>
+        </div>
+    </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast-c" id="toastC"></div>
 
@@ -1196,18 +1209,8 @@ function saveR(){
     if(eid){const i=D.reservations.findIndex(r=>r.id===eid);if(i>=0){data.updatedAt=new Date().toISOString();D.reservations[i]={...D.reservations[i],...data};savedId=eid;toast('Modifié','ok');}}
     else{data.id=uid();data.createdAt=new Date().toISOString();D.reservations.push(data);savedId=data.id;toast('Ajouté','ok');}
     sv();closeSheet('shForm');
-    // Auto-rappel si ménage assigné et arrivée dans le futur
-    if(data.cleaning && pd(data.startDate)>new Date()){
-        const reminded=getReminded();
-        if(!reminded.includes(savedId)){
-            setTimeout(()=>{
-                if(confirm(`Ajouter un rappel au calendrier pour le ménage de ${data.cleaning} ?\n(Veille de l'arrivée de ${n})`)){
-                    addReminder(savedId);
-                    setReminded([...reminded,savedId]);
-                }
-            },400);
-        }
-    }
+    // Rappel calendrier : plus de prompt immediat a la creation.
+    // Le prompt apparait a la prochaine ouverture via checkPendingReminders (popup HTML).
 }
 function delR(){
     const id=document.getElementById('fId').value,r=D.reservations.find(x=>x.id===id);
@@ -1378,19 +1381,52 @@ window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.return
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
 
 // ===== RAPPELS AUTO =====
-const RK='loc_reminded'; // IDs des réservations dont le rappel a été créé
-function getReminded(){try{return JSON.parse(localStorage.getItem(RK)||'[]');}catch(e){return [];}}
-function setReminded(ids){localStorage.setItem(RK,JSON.stringify(ids));}
+// Format v2 : objet {id: 'yes'|'no'} pour distinguer accepte vs refuse (tous les 2 = traite)
+// Migration auto depuis l'ancien format array (tout ID stocke = considere comme 'yes')
+const RK='loc_reminded_v2';
+function getReminded(){
+    try{
+        const raw=localStorage.getItem(RK);
+        if(raw){const o=JSON.parse(raw);if(o&&typeof o==='object'&&!Array.isArray(o))return o;}
+        // Migration de l'ancien format
+        const old=localStorage.getItem('loc_reminded');
+        if(old){const arr=JSON.parse(old);if(Array.isArray(arr)){const o={};arr.forEach(id=>o[id]='yes');localStorage.setItem(RK,JSON.stringify(o));return o;}}
+    }catch(e){}
+    return {};
+}
+function setRemindedState(id,state){const o=getReminded();o[id]=state;localStorage.setItem(RK,JSON.stringify(o));}
+
+let _remPending=[]; // liste des resas en cours dans la popup
 function checkPendingReminders(){
     const reminded=getReminded();
     const now=new Date();
-    const pending=D.reservations.filter(r=>r.cleaning && pd(r.startDate)>now && !reminded.includes(r.id));
-    if(!pending.length)return;
-    const names=pending.map(r=>`• ${r.guestName} (${pnm(r.property)}, ménage ${r.cleaning})`).join('\n');
-    if(confirm(`${pending.length} réservation${pending.length>1?'s':''} sans rappel calendrier :\n\n${names}\n\nAjouter les rappels au calendrier ?`)){
-        pending.forEach((r,i)=>{setTimeout(()=>addReminder(r.id),i*500);});
-        setReminded([...reminded,...pending.map(r=>r.id)]);
-    }
+    _remPending=D.reservations.filter(r=>r.cleaning && pd(r.startDate)>now && !reminded[r.id]);
+    if(!_remPending.length)return;
+    const names=_remPending.map(r=>`<div style="padding:8px 10px;background:var(--gl);border-radius:8px;margin-bottom:6px;font-size:0.85rem"><b>${r.guestName}</b> <span style="color:var(--g)">— ${pnm(r.property)}</span><br><span style="font-size:0.78rem;color:var(--g)">🧹 ${r.cleaning} · Arrivée ${fd(r.startDate)}</span></div>`).join('');
+    document.getElementById('remBody').innerHTML=`
+        <div style="font-size:0.88rem;margin-bottom:12px">
+            <b>${_remPending.length} réservation${_remPending.length>1?'s':''}</b> sans rappel calendrier sur cet appareil :
+        </div>
+        ${names}
+        <div style="font-size:0.78rem;color:var(--g);margin-top:10px;text-align:center">
+            ✅ ajoute les rappels au calendrier de cet appareil<br>
+            ❌ marque comme ignoré (plus de notification)
+        </div>
+    `;
+    document.getElementById('shReminder').classList.add('on');
+}
+function remAck(){
+    _remPending.forEach((r,i)=>{setTimeout(()=>addReminder(r.id),i*500);});
+    _remPending.forEach(r=>setRemindedState(r.id,'yes'));
+    _remPending=[];
+    closeSheet('shReminder');
+    toast('Rappels ajoutés','ok');
+}
+function remDismiss(){
+    _remPending.forEach(r=>setRemindedState(r.id,'no'));
+    _remPending=[];
+    closeSheet('shReminder');
+    toast('Rappels ignorés','ok');
 }
 
 // ===== INIT =====
