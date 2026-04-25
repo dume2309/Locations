@@ -51,11 +51,11 @@
       "endDate": "2026-04-13",
       "persons": 10,
       "amount": 0,
-      "cleaning": "Laetitia",
+      "cleaning": "",
       "notes": "",
       "createdAt": "2026-01-01T00:00:00.000Z",
       "phone": "",
-      "updatedAt": "2026-04-25T20:53:38.586Z"
+      "updatedAt": "2026-04-25T20:56:31.330Z"
     },
     {
       "id": "excel_sp_4",
