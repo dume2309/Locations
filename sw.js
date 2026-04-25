@@ -1,4 +1,4 @@
-const CACHE = 'locations-v13';
+const CACHE = 'locations-v14';
 const URLS = ['./GestionLocations.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

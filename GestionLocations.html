@@ -538,7 +538,7 @@
 
         <div style="text-align:center;padding:16px 0 8px">
             <button class="btn btn-out btn-sm" style="font-size:0.78rem;padding:6px 14px" onclick="forceUpdate()">🔄 Forcer la mise à jour</button>
-            <div style="font-size:0.72rem;color:var(--g);margin-top:8px">Locations v1.9</div>
+            <div style="font-size:0.72rem;color:var(--g);margin-top:8px">Locations v1.10</div>
         </div>
         <div class="sec-title" style="cursor:pointer;user-select:none" onclick="promptAdmin()">🔒 Admin</div>
         <div id="adminArea" style="display:none">
@@ -1248,8 +1248,17 @@ function openSendList(){
     document.getElementById('sendListPreview').textContent=genResListMsg();
     document.getElementById('shSendList').classList.add('on');
 }
+// Debounce : une seule popup pour TOUTES les modifs d'une session.
+// Chaque modif redemarre un timer de 30s. La popup apparait quand plus rien ne bouge pendant 30s.
+let _askSendTimer=null;
 function askSendList(){
-    setTimeout(()=>document.getElementById('shAskSend').classList.add('on'),300);
+    if(_askSendTimer)clearTimeout(_askSendTimer);
+    // Si la popup est deja affichee, ne pas la fermer
+    if(document.getElementById('shAskSend').classList.contains('on'))return;
+    _askSendTimer=setTimeout(()=>{
+        _askSendTimer=null;
+        document.getElementById('shAskSend').classList.add('on');
+    },30000);
 }
 function sendListTo(who,mode){
     const c=CT[who];if(!c){toast('Contact introuvable','err');return;}
