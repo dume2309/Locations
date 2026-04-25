@@ -154,7 +154,7 @@
       "notes": "",
       "createdAt": "2026-01-01T00:00:00.000Z",
       "phone": "",
-      "updatedAt": "2026-04-07T07:32:18.157Z"
+      "updatedAt": "2026-04-25T21:03:51.891Z"
     },
     {
       "id": "excel_sp_11",
@@ -178,11 +178,11 @@
       "endDate": "2026-08-06",
       "persons": 8,
       "amount": 0,
-      "cleaning": "Bea",
+      "cleaning": "",
       "notes": "",
       "createdAt": "2026-01-01T00:00:00.000Z",
       "phone": "",
-      "updatedAt": "2026-04-25T21:02:04.551Z"
+      "updatedAt": "2026-04-25T21:02:43.697Z"
     },
     {
       "id": "excel_sp_13",
@@ -277,7 +277,7 @@
       "notes": "",
       "createdAt": "2026-01-01T00:00:00.000Z",
       "phone": "",
-      "updatedAt": "2026-04-07T08:04:26.993Z"
+      "updatedAt": "2026-04-25T21:03:06.511Z"
     },
     {
       "property": "pn",
