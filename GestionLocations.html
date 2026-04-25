@@ -455,6 +455,11 @@
         <div class="sec-title">👥 Contacts</div>
         <div id="ctArea"></div>
 
+        <div class="sec-title">📤 Partager la liste</div>
+        <div class="card">
+            <button class="btn btn-out btn-full" onclick="openSendList()">📋 Envoyer la liste des locations à Bea / Steph</button>
+        </div>
+
         <div class="sec-title">💾 Données</div>
         <div class="card">
             <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="expCSV()">📊 Export Excel (CSV)</button>
@@ -533,7 +538,7 @@
 
         <div style="text-align:center;padding:16px 0 8px">
             <button class="btn btn-out btn-sm" style="font-size:0.78rem;padding:6px 14px" onclick="forceUpdate()">🔄 Forcer la mise à jour</button>
-            <div style="font-size:0.72rem;color:var(--g);margin-top:8px">Locations v1.8</div>
+            <div style="font-size:0.72rem;color:var(--g);margin-top:8px">Locations v1.9</div>
         </div>
         <div class="sec-title" style="cursor:pointer;user-select:none" onclick="promptAdmin()">🔒 Admin</div>
         <div id="adminArea" style="display:none">
@@ -619,6 +624,63 @@
             <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="expCSV();closeSheet('shMenu')">📊 Excel</button>
             <button class="btn btn-out btn-full" style="margin-bottom:8px" onclick="closeSheet('shMenu');setTimeout(()=>window.print(),300)">🖨️ Imprimer</button>
             <button class="btn btn-out btn-full" onclick="closeSheet('shMenu')">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<!-- SHEET : ENVOI LISTE LOCATIONS -->
+<div class="sheet-bg" id="shSendList">
+    <div class="sheet">
+        <div class="sheet-bar"></div>
+        <div class="sheet-title">📋 Envoyer la liste</div>
+        <div class="sheet-body" id="sendListBody">
+            <div style="font-size:0.85rem;color:var(--g);margin-bottom:14px" id="sendListIntro">À qui envoyer la liste mise à jour ?</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                <div style="text-align:center">
+                    <div style="font-weight:700;margin-bottom:6px">Bea</div>
+                    <button class="btn btn-sm" style="background:#25D366;color:white;width:100%;margin-bottom:6px" onclick="sendListTo('bea','wa')">📱 WhatsApp</button>
+                    <button class="btn btn-sm btn-out" style="width:100%" onclick="sendListTo('bea','sms')">📨 SMS</button>
+                </div>
+                <div style="text-align:center">
+                    <div style="font-weight:700;margin-bottom:6px">Steph</div>
+                    <button class="btn btn-sm" style="background:#25D366;color:white;width:100%;margin-bottom:6px" onclick="sendListTo('steph','wa')">📱 WhatsApp</button>
+                    <button class="btn btn-sm btn-out" style="width:100%" onclick="sendListTo('steph','sms')">📨 SMS</button>
+                </div>
+            </div>
+            <button class="btn btn-out btn-full" style="margin-top:10px;font-size:0.82rem" onclick="copyResList()">📋 Copier le texte</button>
+            <details style="margin-top:14px;font-size:0.78rem;color:var(--g)">
+                <summary style="cursor:pointer">Aperçu du message</summary>
+                <pre id="sendListPreview" style="background:var(--gl);padding:10px;border-radius:8px;font-size:0.72rem;white-space:pre-wrap;margin-top:8px;max-height:240px;overflow-y:auto"></pre>
+            </details>
+        </div>
+        <div class="sheet-foot">
+            <button class="btn btn-out btn-full" onclick="closeSheet('shSendList')">Fermer</button>
+        </div>
+    </div>
+</div>
+
+<!-- SHEET : APRES MODIF -->
+<div class="sheet-bg" id="shAskSend">
+    <div class="sheet">
+        <div class="sheet-bar"></div>
+        <div class="sheet-title">📤 Envoyer la liste mise à jour ?</div>
+        <div class="sheet-body">
+            <div style="font-size:0.85rem;color:var(--g);margin-bottom:14px">La liste des locations a été modifiée. Voulez-vous l'envoyer à Bea ou Steph maintenant ?</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                <div style="text-align:center">
+                    <div style="font-weight:700;margin-bottom:6px">Bea</div>
+                    <button class="btn btn-sm" style="background:#25D366;color:white;width:100%;margin-bottom:6px" onclick="sendListTo('bea','wa');closeSheet('shAskSend')">📱 WhatsApp</button>
+                    <button class="btn btn-sm btn-out" style="width:100%" onclick="sendListTo('bea','sms');closeSheet('shAskSend')">📨 SMS</button>
+                </div>
+                <div style="text-align:center">
+                    <div style="font-weight:700;margin-bottom:6px">Steph</div>
+                    <button class="btn btn-sm" style="background:#25D366;color:white;width:100%;margin-bottom:6px" onclick="sendListTo('steph','wa');closeSheet('shAskSend')">📱 WhatsApp</button>
+                    <button class="btn btn-sm btn-out" style="width:100%" onclick="sendListTo('steph','sms');closeSheet('shAskSend')">📨 SMS</button>
+                </div>
+            </div>
+        </div>
+        <div class="sheet-foot">
+            <button class="btn btn-out btn-full" onclick="closeSheet('shAskSend')">Plus tard</button>
         </div>
     </div>
 </div>
@@ -1150,8 +1212,7 @@ function saveR(){
     if(eid){const i=D.reservations.findIndex(r=>r.id===eid);if(i>=0){data.updatedAt=new Date().toISOString();D.reservations[i]={...D.reservations[i],...data};savedId=eid;toast('Modifié','ok');}}
     else{data.id=uid();data.createdAt=new Date().toISOString();D.reservations.push(data);savedId=data.id;toast('Ajouté','ok');}
     sv();closeSheet('shForm');
-    // Rappel calendrier : plus de prompt immediat a la creation.
-    // Le prompt apparait a la prochaine ouverture via checkPendingReminders (popup HTML).
+    askSendList();
 }
 function delR(){
     const id=document.getElementById('fId').value,r=D.reservations.find(x=>x.id===id);
@@ -1160,6 +1221,52 @@ function delR(){
     if(!D.deletedIds)D.deletedIds=[];
     if(!D.deletedIds.includes(id))D.deletedIds.push(id);
     sv();closeSheet('shForm');toast('Supprimé','ok');
+    askSendList();
+}
+
+// ===== ENVOI LISTE LOCATIONS (SMS / WhatsApp) =====
+function genResListMsg(){
+    const now=new Date();now.setHours(0,0,0,0);
+    const future=D.reservations.filter(r=>pd(r.endDate)>=now).sort((a,b)=>pd(a.startDate)-pd(b.startDate));
+    if(!future.length)return 'Aucune location à venir.';
+    let txt=`📋 Locations à venir — mis à jour le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}\n`;
+    Object.keys(D.properties).forEach(pid=>{
+        const rs=future.filter(r=>r.property===pid);
+        if(!rs.length)return;
+        txt+=`\n🏠 ${pnm(pid).toUpperCase()}\n`;
+        rs.forEach(r=>{
+            const d=dys(r.startDate,r.endDate);
+            txt+=`• ${r.guestName} : ${fds(r.startDate)} → ${fds(r.endDate)} (${d}j, ${r.persons}p) ${r.platform}`;
+            if(r.cleaning)txt+=` - 🧹 ${r.cleaning}`;
+            if(r.amount)txt+=` - ${r.amount}€`;
+            txt+='\n';
+        });
+    });
+    return txt.trim();
+}
+function openSendList(){
+    document.getElementById('sendListPreview').textContent=genResListMsg();
+    document.getElementById('shSendList').classList.add('on');
+}
+function askSendList(){
+    setTimeout(()=>document.getElementById('shAskSend').classList.add('on'),300);
+}
+function sendListTo(who,mode){
+    const c=CT[who];if(!c){toast('Contact introuvable','err');return;}
+    const ph=(c.phone||'').replace(/[^0-9+]/g,'');
+    if(!ph){toast(`Pas de numéro pour ${c.name}. Ajoute-le dans Réglages.`,'err');return;}
+    const msg=genResListMsg();
+    if(mode==='wa'){
+        const url='https://wa.me/'+ph+'?text='+encodeURIComponent(msg);
+        window.open(url,'_blank');
+    }else{
+        const url='sms:'+ph+'?body='+encodeURIComponent(msg);
+        window.open(url,'_self');
+    }
+    closeSheet('shSendList');
+}
+function copyResList(){
+    cpTxt(genResListMsg());
 }
 
 // ===== SETTINGS =====
