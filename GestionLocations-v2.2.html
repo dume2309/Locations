@@ -541,7 +541,7 @@
 
         <div style="text-align:center;padding:16px 0 8px">
             <button class="btn btn-out btn-sm" style="font-size:0.78rem;padding:6px 14px" onclick="forceUpdate()">🔄 Forcer la mise à jour</button>
-            <div style="font-size:0.72rem;color:var(--g);margin-top:8px">Locations v2.3</div>
+            <div style="font-size:0.72rem;color:var(--g);margin-top:8px">Locations v2.2</div>
         </div>
         <div class="sec-title" style="cursor:pointer;user-select:none" onclick="promptAdmin()">🔒 Admin</div>
         <div id="adminArea" style="display:none">
@@ -686,7 +686,7 @@ const INIT={"properties":{"sp":{"name":"Santu Pietru","wifi":"","keyBox":""},"pn
 const DEF_CT={laetitia:{name:'Laetitia',role:'Femme de ménage',phone:'',color:'#7c3aed'},steph:{name:'Steph',role:'Propriétaire',phone:'',color:'#059669'},bea:{name:'Bea',role:'Propriétaire',phone:'',color:'#d97706'}};
 
 let D,CT,cM,cY,cf='all',rf='all',dirty=false;
-let M={lastSendAt:null,deletedReservations:[],snapshotAtLastSend:null}; // V2.2+ — méta locale (récap des changements). NE JAMAIS pousser sur GitHub.
+let M={lastSendAt:null,deletedReservations:[]}; // V2.2 — méta locale (récap des changements). NE JAMAIS pousser sur GitHub.
 
 // ===== GITHUB SYNC =====
 const _P=['Z2l0aHVi','X3BhdF8x','MUJQQkxR','N1kwR0d2','NTFhV1Bu','S2ZQX0c2','eTc2ZTlk','dU5DODc4','TmN6VExn','S25nTWdx','Rkh4cE9x','YzFTVjZH','NVExVHo1','VlU1V0FP','RHl0MlVW','WDkx'];
@@ -891,14 +891,10 @@ function fixContacts(){
 }
 function sv(){localStorage.setItem(SK,JSON.stringify(D));dirty=true;document.getElementById('uDot').style.display='block';refresh();ghPush();}
 function svC(){localStorage.setItem(CK,JSON.stringify(CT));dirty=true;const d=document.getElementById('uDot');if(d)d.style.display='block';ghPush();}
-// V2.2+ — Meta locale (lastSendAt + snapshots de suppressions + snapshot complet à chaque envoi pour les diffs). Jamais envoyée sur GitHub.
-function snapshotReservations(){
-    return D.reservations.map(r=>({id:r.id,guestName:r.guestName,property:r.property,platform:r.platform,startDate:r.startDate,endDate:r.endDate,persons:r.persons,amount:r.amount,cleaning:r.cleaning,notes:r.notes,phone:r.phone||''}));
-}
+// V2.2 — Meta locale (lastSendAt + snapshots des suppressions). Jamais envoyée sur GitHub.
 function ldM(){
-    try{const r=localStorage.getItem(MK);if(r){const m=JSON.parse(r);M={lastSendAt:m.lastSendAt||null,deletedReservations:Array.isArray(m.deletedReservations)?m.deletedReservations:[],snapshotAtLastSend:Array.isArray(m.snapshotAtLastSend)?m.snapshotAtLastSend:null};}}catch(e){M={lastSendAt:null,deletedReservations:[],snapshotAtLastSend:null};}
-    if(!M.lastSendAt)M.lastSendAt=new Date().toISOString(); // 1er chargement : ancre maintenant pour éviter de marquer les résas existantes comme "nouvelles"
-    if(!M.snapshotAtLastSend)M.snapshotAtLastSend=snapshotReservations(); // V2.3 : baseline pour pouvoir calculer les diffs des modifs
+    try{const r=localStorage.getItem(MK);if(r){const m=JSON.parse(r);M={lastSendAt:m.lastSendAt||null,deletedReservations:Array.isArray(m.deletedReservations)?m.deletedReservations:[]};}}catch(e){M={lastSendAt:null,deletedReservations:[]};}
+    if(!M.lastSendAt)M.lastSendAt=new Date().toISOString(); // 1er chargement V2.2 : on ancre maintenant pour éviter de marquer toutes les résas existantes comme "nouvelles"
     svM();
 }
 function svM(){try{localStorage.setItem(MK,JSON.stringify(M));}catch(e){console.warn('svM:',e);}}
@@ -1232,40 +1228,18 @@ function delR(){
 }
 
 // ===== ENVOI LISTE LOCATIONS (SMS / WhatsApp) =====
-// V2.3 — Diff champ par champ entre snapshot au dernier envoi et état actuel
-function resDiff(o,n){
-    const diffs=[];
-    const c=v=>(v===''||v==null||v===undefined)?'—':v;
-    if((o.guestName||'')!==(n.guestName||''))diffs.push(`nom : ${c(o.guestName)} → ${c(n.guestName)}`);
-    if(o.property!==n.property)diffs.push(`propriété : ${pnm(o.property)} → ${pnm(n.property)}`);
-    if((o.platform||'')!==(n.platform||''))diffs.push(`plateforme : ${c(o.platform)} → ${c(n.platform)}`);
-    if(o.startDate!==n.startDate)diffs.push(`arrivée : ${fds(o.startDate)} → ${fds(n.startDate)}`);
-    if(o.endDate!==n.endDate)diffs.push(`départ : ${fds(o.endDate)} → ${fds(n.endDate)}`);
-    if((o.persons||0)!==(n.persons||0))diffs.push(`personnes : ${c(o.persons)} → ${c(n.persons)}`);
-    if((o.amount||0)!==(n.amount||0))diffs.push(`montant : ${c(o.amount)}€ → ${c(n.amount)}€`);
-    if((o.cleaning||'')!==(n.cleaning||''))diffs.push(`ménage : ${c(o.cleaning)} → ${c(n.cleaning)}`);
-    if((o.notes||'')!==(n.notes||''))diffs.push(`notes modifiées`);
-    if((o.phone||'')!==(n.phone||''))diffs.push(`téléphone : ${c(o.phone)} → ${c(n.phone)}`);
-    return diffs;
-}
-// V2.2/V2.3 — Récap des changements depuis le dernier envoi
+// V2.2 — Récap des changements depuis le dernier envoi
 function genChangesSummary(){
     const last=M&&M.lastSendAt?new Date(M.lastSendAt):null;
     if(!last||isNaN(last.getTime()))return ''; // Pas de baseline → pas de récap
     const today=new Date();today.setHours(0,0,0,0);
     const isFuture=r=>{const d=pd(r.endDate);return d&&d>=today;};
     const isAfter=ts=>{if(!ts)return false;const d=new Date(ts);return !isNaN(d.getTime())&&d>last;};
-    const snap=Array.isArray(M.snapshotAtLastSend)?M.snapshotAtLastSend:[];
-    const snapById=new Map(snap.map(s=>[s.id,s]));
     const added=[],modified=[],deleted=[];
     D.reservations.forEach(r=>{
         if(!isFuture(r))return;
         if(isAfter(r.createdAt)){added.push(r);return;}
-        if(!isAfter(r.updatedAt))return;
-        const old=snapById.get(r.id);
-        if(!old)return; // pas de baseline pour cette résa → on ne peut rien dire d'utile
-        const diffs=resDiff(old,r);
-        if(diffs.length)modified.push({r,diffs});
+        if(isAfter(r.updatedAt))modified.push(r);
     });
     (M.deletedReservations||[]).forEach(r=>{
         if(!isAfter(r.deletedAt))return;
@@ -1277,10 +1251,7 @@ function genChangesSummary(){
     let txt=`🔔 Changements depuis le dernier envoi (${dLast}) :\n`;
     const fmt=r=>`${r.guestName} — ${pnm(r.property)}, ${fds(r.startDate)} → ${fds(r.endDate)} (${dys(r.startDate,r.endDate)}j)`;
     added.forEach(r=>{txt+=`🆕 Nouveau : ${fmt(r)}\n`;});
-    modified.forEach(({r,diffs})=>{
-        txt+=`✏️ Modifié : ${fmt(r)}\n`;
-        diffs.forEach(d=>{txt+=`   ↳ ${d}\n`;});
-    });
+    modified.forEach(r=>{txt+=`✏️ Modifié : ${fmt(r)}\n`;});
     deleted.forEach(r=>{txt+=`❌ Annulé : ${fmt(r)}\n`;});
     return txt;
 }
@@ -1334,12 +1305,12 @@ function sendListTo(who,mode){
         const url='sms:'+ph+'?body='+encodeURIComponent(msg);
         window.open(url,'_self');
     }
-    M.lastSendAt=new Date().toISOString();M.snapshotAtLastSend=snapshotReservations();svM(); // V2.2/V2.3 — reset le récap + snapshot pour les diffs
+    M.lastSendAt=new Date().toISOString();svM(); // V2.2 — reset le récap
     closeSheet('shSendList');
 }
 function copyResList(){
     cpTxt(genResListMsg());
-    M.lastSendAt=new Date().toISOString();M.snapshotAtLastSend=snapshotReservations();svM(); // V2.2/V2.3 — reset + snapshot (copie = considéré envoyé)
+    M.lastSendAt=new Date().toISOString();svM(); // V2.2 — reset le récap (copie = considéré envoyé)
 }
 
 // ===== SETTINGS =====
@@ -1501,23 +1472,23 @@ window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.return
 // ===== SERVICE WORKER (PWA) =====
 if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});}
 
-// ===== FORCE UPDATE (vide les caches et reload) — V2.3 : fiable iOS 1000% =====
+// ===== FORCE UPDATE (vide les caches et reload) =====
 async function forceUpdate(){
-    // V2.3 — cache-buster URL : iOS Safari ignore reload(true) et son cache HTTP est très agressif.
-    // En forçant une URL "neuve" (timestamp unique), le navigateur ne peut PAS servir l'ancienne version depuis le cache.
-    const bustUrl=()=>{location.href=location.pathname+'?v='+Date.now();};
     try{
         toast('Mise a jour en cours...','ok');
+        // Unregister service workers
         if('serviceWorker' in navigator){
             const regs=await navigator.serviceWorker.getRegistrations();
             await Promise.all(regs.map(r=>r.unregister()));
         }
+        // Delete all caches
         if('caches' in window){
             const keys=await caches.keys();
             await Promise.all(keys.map(k=>caches.delete(k)));
         }
-        setTimeout(bustUrl,500);
-    }catch(e){bustUrl();}
+        // Reload sans cache navigateur
+        setTimeout(()=>location.reload(true),500);
+    }catch(e){location.reload(true);}
 }
 
 // (Rappels calendrier .ics retires en v1.8 - la timeline d'accueil de l'appli suffit)
