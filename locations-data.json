@@ -36,9 +36,11 @@
       "endDate": "2026-04-11",
       "persons": 10,
       "amount": 0,
-      "cleaning": "",
+      "cleaning": "Bea",
       "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z"
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "phone": "",
+      "updatedAt": "2026-04-25T10:56:58.434Z"
     },
     {
       "id": "excel_sp_3",
