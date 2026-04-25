@@ -541,7 +541,7 @@
 
         <div style="text-align:center;padding:16px 0 8px">
             <button class="btn btn-out btn-sm" style="font-size:0.78rem;padding:6px 14px" onclick="forceUpdate()">🔄 Forcer la mise à jour</button>
-            <div style="font-size:0.72rem;color:var(--g);margin-top:8px">Locations v2.2</div>
+            <div style="font-size:0.72rem;color:var(--g);margin-top:8px">Locations v2.1</div>
         </div>
         <div class="sec-title" style="cursor:pointer;user-select:none" onclick="promptAdmin()">🔒 Admin</div>
         <div id="adminArea" style="display:none">
@@ -681,12 +681,11 @@
 
 <script>
 // ===== DATA =====
-const SK='loc_v3', CK='loc_ct_v1', MK='loc_meta_v1'; // MK : local-only (jamais sync GitHub) — V2.2
+const SK='loc_v3', CK='loc_ct_v1';
 const INIT={"properties":{"sp":{"name":"Santu Pietru","wifi":"","keyBox":""},"pn":{"name":"Pietranera","wifi":"","keyBox":""}},"reservations":[{"id":"excel_sp_1","property":"sp","platform":"HOMEREZ","guestName":"L-Dufour","startDate":"2026-03-27","endDate":"2026-03-30","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_2","property":"sp","platform":"HOMEREZ","guestName":"A-Foivard","startDate":"2026-04-04","endDate":"2026-04-11","persons":10,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_3","property":"sp","platform":"AIRBNB","guestName":"M-Freyssinet","startDate":"2026-04-12","endDate":"2026-04-13","persons":10,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_4","property":"sp","platform":"AIRBNB","guestName":"I M OLIVIER","startDate":"2026-04-17","endDate":"2026-04-18","persons":7,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_5","property":"sp","platform":"HOMEREZ","guestName":"C-Mendes","startDate":"2026-04-18","endDate":"2026-04-25","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_6","property":"sp","platform":"AIRBNB","guestName":"A C POLETTI","startDate":"2026-04-27","endDate":"2026-04-30","persons":6,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_7","property":"sp","platform":"AIRBNB","guestName":"T-blanchot","startDate":"2026-05-23","endDate":"2026-05-24","persons":6,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_8","property":"sp","platform":"HOMEREZ","guestName":"M-Celegato","startDate":"2026-06-17","endDate":"2026-06-27","persons":8,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_9","property":"sp","platform":"AIRBNB","guestName":"S-Halm","startDate":"2026-07-13","endDate":"2026-07-19","persons":8,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_10","property":"sp","platform":"AIRBNB","guestName":"D-Quiles","startDate":"2026-07-20","endDate":"2026-07-28","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_11","property":"sp","platform":"AIRBNB","guestName":"H Larbernede","startDate":"2026-07-29","endDate":"2026-08-01","persons":8,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_12","property":"sp","platform":"AIRBNB","guestName":"N Vigroux","startDate":"2026-08-01","endDate":"2026-08-06","persons":8,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_13","property":"sp","platform":"AIRBNB","guestName":"C-Froger","startDate":"2026-08-06","endDate":"2026-08-11","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_14","property":"sp","platform":"AIRBNB","guestName":"D R FIRENZE","startDate":"2026-08-11","endDate":"2026-08-15","persons":7,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_15","property":"sp","platform":"HOMEREZ","guestName":"C-Guillonneau","startDate":"2026-08-15","endDate":"2026-08-22","persons":10,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_16","property":"sp","platform":"AIRBNB","guestName":"G-L'Epinoy","startDate":"2026-08-23","endDate":"2026-08-27","persons":9,"amount":0,"cleaning":"","notes":""},{"id":"excel_sp_17","property":"sp","platform":"AIRBNB","guestName":"C Payet","startDate":"2026-09-25","endDate":"2026-09-28","persons":5,"amount":0,"cleaning":"","notes":""},{"id":"excel_pn_18","property":"pn","platform":"AIRBNB","guestName":"V Avudenez","startDate":"2026-04-24","endDate":"2026-04-25","persons":4,"amount":0,"cleaning":"","notes":""},{"id":"excel_pn_19","property":"pn","platform":"AIRBNB","guestName":"J Rutin","startDate":"2026-07-16","endDate":"2026-07-18","persons":4,"amount":0,"cleaning":"","notes":""},{"id":"excel_pn_20","property":"pn","platform":"PULSE","guestName":"M-Plachtova","startDate":"2026-06-29","endDate":"2026-07-09","persons":2,"amount":1366.9,"cleaning":"","notes":""},{"id":"excel_pn_21","property":"pn","platform":"PULSE","guestName":"F-Nardone","startDate":"2026-08-06","endDate":"2026-08-11","persons":5,"amount":796.25,"cleaning":"","notes":""}],"version":1};
 const DEF_CT={laetitia:{name:'Laetitia',role:'Femme de ménage',phone:'',color:'#7c3aed'},steph:{name:'Steph',role:'Propriétaire',phone:'',color:'#059669'},bea:{name:'Bea',role:'Propriétaire',phone:'',color:'#d97706'}};
 
 let D,CT,cM,cY,cf='all',rf='all',dirty=false;
-let M={lastSendAt:null,deletedReservations:[]}; // V2.2 — méta locale (récap des changements). NE JAMAIS pousser sur GitHub.
 
 // ===== GITHUB SYNC =====
 const _P=['Z2l0aHVi','X3BhdF8x','MUJQQkxR','N1kwR0d2','NTFhV1Bu','S2ZQX0c2','eTc2ZTlk','dU5DODc4','TmN6VExn','S25nTWdx','Rkh4cE9x','YzFTVjZH','NVExVHo1','VlU1V0FP','RHl0MlVW','WDkx'];
@@ -891,13 +890,6 @@ function fixContacts(){
 }
 function sv(){localStorage.setItem(SK,JSON.stringify(D));dirty=true;document.getElementById('uDot').style.display='block';refresh();ghPush();}
 function svC(){localStorage.setItem(CK,JSON.stringify(CT));dirty=true;const d=document.getElementById('uDot');if(d)d.style.display='block';ghPush();}
-// V2.2 — Meta locale (lastSendAt + snapshots des suppressions). Jamais envoyée sur GitHub.
-function ldM(){
-    try{const r=localStorage.getItem(MK);if(r){const m=JSON.parse(r);M={lastSendAt:m.lastSendAt||null,deletedReservations:Array.isArray(m.deletedReservations)?m.deletedReservations:[]};}}catch(e){M={lastSendAt:null,deletedReservations:[]};}
-    if(!M.lastSendAt)M.lastSendAt=new Date().toISOString(); // 1er chargement V2.2 : on ancre maintenant pour éviter de marquer toutes les résas existantes comme "nouvelles"
-    svM();
-}
-function svM(){try{localStorage.setItem(MK,JSON.stringify(M));}catch(e){console.warn('svM:',e);}}
 
 // Helpers
 function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
@@ -1216,10 +1208,6 @@ function saveR(){
 function delR(){
     const id=document.getElementById('fId').value,r=D.reservations.find(x=>x.id===id);
     if(!r||!confirm(`Supprimer ${r.guestName} ?`))return;
-    // V2.2 — snapshot local pour le récap des changements (jamais sync GitHub)
-    if(!Array.isArray(M.deletedReservations))M.deletedReservations=[];
-    M.deletedReservations.push({id:r.id,guestName:r.guestName,property:r.property,startDate:r.startDate,endDate:r.endDate,persons:r.persons,platform:r.platform,cleaning:r.cleaning,amount:r.amount,deletedAt:new Date().toISOString()});
-    svM();
     D.reservations=D.reservations.filter(x=>x.id!==id);
     if(!D.deletedIds)D.deletedIds=[];
     if(!D.deletedIds.includes(id))D.deletedIds.push(id);
@@ -1228,41 +1216,11 @@ function delR(){
 }
 
 // ===== ENVOI LISTE LOCATIONS (SMS / WhatsApp) =====
-// V2.2 — Récap des changements depuis le dernier envoi
-function genChangesSummary(){
-    const last=M&&M.lastSendAt?new Date(M.lastSendAt):null;
-    if(!last||isNaN(last.getTime()))return ''; // Pas de baseline → pas de récap
-    const today=new Date();today.setHours(0,0,0,0);
-    const isFuture=r=>{const d=pd(r.endDate);return d&&d>=today;};
-    const isAfter=ts=>{if(!ts)return false;const d=new Date(ts);return !isNaN(d.getTime())&&d>last;};
-    const added=[],modified=[],deleted=[];
-    D.reservations.forEach(r=>{
-        if(!isFuture(r))return;
-        if(isAfter(r.createdAt)){added.push(r);return;}
-        if(isAfter(r.updatedAt))modified.push(r);
-    });
-    (M.deletedReservations||[]).forEach(r=>{
-        if(!isAfter(r.deletedAt))return;
-        if(!isFuture(r))return; // n'afficher que les annulations de résas qui auraient été à venir
-        deleted.push(r);
-    });
-    if(!added.length&&!modified.length&&!deleted.length)return '✅ Aucun changement depuis le dernier envoi\n';
-    const dLast=last.toLocaleDateString('fr-FR');
-    let txt=`🔔 Changements depuis le dernier envoi (${dLast}) :\n`;
-    const fmt=r=>`${r.guestName} — ${pnm(r.property)}, ${fds(r.startDate)} → ${fds(r.endDate)} (${dys(r.startDate,r.endDate)}j)`;
-    added.forEach(r=>{txt+=`🆕 Nouveau : ${fmt(r)}\n`;});
-    modified.forEach(r=>{txt+=`✏️ Modifié : ${fmt(r)}\n`;});
-    deleted.forEach(r=>{txt+=`❌ Annulé : ${fmt(r)}\n`;});
-    return txt;
-}
 function genResListMsg(){
     const now=new Date();now.setHours(0,0,0,0);
     const future=D.reservations.filter(r=>pd(r.endDate)>=now).sort((a,b)=>pd(a.startDate)-pd(b.startDate));
     if(!future.length)return 'Aucune location à venir.';
-    let txt='';
-    const summary=genChangesSummary();
-    if(summary)txt+=summary+'\n';
-    txt+=`📋 Locations à venir — mis à jour le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}\n`;
+    let txt=`📋 Locations à venir — mis à jour le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}\n`;
     Object.keys(D.properties).forEach(pid=>{
         const rs=future.filter(r=>r.property===pid);
         if(!rs.length)return;
@@ -1305,12 +1263,10 @@ function sendListTo(who,mode){
         const url='sms:'+ph+'?body='+encodeURIComponent(msg);
         window.open(url,'_self');
     }
-    M.lastSendAt=new Date().toISOString();svM(); // V2.2 — reset le récap
     closeSheet('shSendList');
 }
 function copyResList(){
     cpTxt(genResListMsg());
-    M.lastSendAt=new Date().toISOString();svM(); // V2.2 — reset le récap (copie = considéré envoyé)
 }
 
 // ===== SETTINGS =====
@@ -1494,7 +1450,7 @@ async function forceUpdate(){
 // (Rappels calendrier .ics retires en v1.8 - la timeline d'accueil de l'appli suffit)
 
 // ===== INIT =====
-ld();ldC();ldM();initCalMonth();refresh();
+ld();ldC();initCalMonth();refresh();
 // Synchro GitHub au démarrage puis rappels
 ghPull().then(()=>refresh());
 </script>
