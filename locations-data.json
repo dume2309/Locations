@@ -313,10 +313,11 @@
       "endDate": "2026-05-17",
       "persons": 3,
       "amount": 0,
-      "cleaning": "",
+      "cleaning": "Steph",
       "notes": "",
       "id": "mo6y019v6ebpn",
-      "createdAt": "2026-04-20T08:38:11.829Z"
+      "createdAt": "2026-04-20T08:38:11.829Z",
+      "updatedAt": "2026-04-25T20:37:00.704Z"
     },
     {
       "property": "pn",
