@@ -315,11 +315,11 @@
       "endDate": "2026-05-17",
       "persons": 3,
       "amount": 0,
-      "cleaning": "",
+      "cleaning": "Bea",
       "notes": "",
       "id": "mo6y019v6ebpn",
       "createdAt": "2026-04-20T08:38:11.829Z",
-      "updatedAt": "2026-04-25T20:45:20.916Z"
+      "updatedAt": "2026-04-25T20:52:28.613Z"
     },
     {
       "property": "pn",
