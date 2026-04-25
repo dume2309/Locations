@@ -27,6 +27,12 @@
 - **NE JAMAIS** faire dépendre une nouvelle feature de champs ajoutés dans `D` (l'objet sync) si une version précédente tourne encore sur un autre appareil — la version précédente n'écrasera pas ces champs au push.
 - Pour les nouveaux états locaux (récap des changements, méta, etc.), utiliser une **clé localStorage séparée** (ex : `loc_meta_v1`), jamais incluse dans le push GitHub.
 
+## Récap des changements (message Bea/Steph)
+
+- Le récap en haut du message envoyé à Bea/Steph est focalisé sur l'**avenir**.
+- Les modifications, ajouts ou suppressions de **réservations passées** (endDate < aujourd'hui) **NE DOIVENT JAMAIS** apparaître dans le récap. Elles n'intéressent pas Bea/Steph.
+- L'utilisateur a déjà un toast "Modifié" / "Ajouté" / "Supprimé" en vert dans l'appli au moment de l'action — c'est sa confirmation visuelle, pas besoin de la dupliquer dans le récap envoyé.
+
 ## Branche de dev
 
 - Branche dédiée pour les changements : `claude/add-change-summary-fg9eb` (ou autre suivant la fonctionnalité).
