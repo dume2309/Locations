@@ -178,9 +178,11 @@
       "endDate": "2026-08-06",
       "persons": 8,
       "amount": 0,
-      "cleaning": "",
+      "cleaning": "Bea",
       "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z"
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "phone": "",
+      "updatedAt": "2026-04-25T21:02:04.551Z"
     },
     {
       "id": "excel_sp_13",
