@@ -135,12 +135,15 @@
             text-align: center; padding: 6px 2px; font-size: 0.78rem; border-radius: 8px;
             position: relative; cursor: pointer; font-weight: 500;
         }
-        .mc-d.today { background: var(--blue); color: white; font-weight: 700; }
         .mc-d.empty { visibility: hidden; }
         .mc-d.has-sp { background: var(--green-bg); color: var(--green); font-weight: 700; }
         .mc-d.has-pn { background: var(--orange-bg); color: var(--orange); font-weight: 700; }
         .mc-d.has-both { background: linear-gradient(135deg, var(--green-bg) 50%, var(--orange-bg) 50%); font-weight: 700; }
-        .mc-d.today.has-sp, .mc-d.today.has-pn, .mc-d.today.has-both { outline: 3px solid var(--blue); outline-offset: -1px; }
+        /* "Aujourd'hui" prime toujours visuellement (specificite renforcee + !important pour passer outre has-sp/has-pn) */
+        .mc-d.today, .mc-d.today.has-sp, .mc-d.today.has-pn, .mc-d.today.has-both {
+            background: var(--blue) !important; color: white !important; font-weight: 800;
+            box-shadow: 0 0 0 2px white inset, 0 0 0 4px var(--blue);
+        }
 
         /* ===== QUICK STATS ===== */
         .qstats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
@@ -538,7 +541,7 @@
 
         <div style="text-align:center;padding:16px 0 8px">
             <button class="btn btn-out btn-sm" style="font-size:0.78rem;padding:6px 14px" onclick="forceUpdate()">🔄 Forcer la mise à jour</button>
-            <div style="font-size:0.72rem;color:var(--g);margin-top:8px">Locations v2.0</div>
+            <div style="font-size:0.72rem;color:var(--g);margin-top:8px">Locations v2.1</div>
         </div>
         <div class="sec-title" style="cursor:pointer;user-select:none" onclick="promptAdmin()">🔒 Admin</div>
         <div id="adminArea" style="display:none">
