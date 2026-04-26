@@ -350,6 +350,20 @@
       "notes": "",
       "id": "mocr9wznqlk90",
       "createdAt": "2026-04-24T10:16:32.579Z"
+    },
+    {
+      "property": "sp",
+      "platform": "AIRBNB",
+      "guestName": "Adeline",
+      "phone": "",
+      "startDate": "2026-07-10",
+      "endDate": "2026-07-12",
+      "persons": 9,
+      "amount": 0,
+      "cleaning": "",
+      "notes": "",
+      "id": "mofwv09waydhk",
+      "createdAt": "2026-04-26T15:16:13.221Z"
     }
   ],
   "version": 1,
