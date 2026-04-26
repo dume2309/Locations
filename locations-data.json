@@ -368,16 +368,17 @@
     {
       "property": "pn",
       "platform": "AIRBNB",
-      "guestName": "Constant gregoriev",
+      "guestName": "Constant gregorie",
       "phone": "",
       "startDate": "2026-07-23",
       "endDate": "2026-08-14",
       "persons": 4,
       "amount": 0,
       "cleaning": "",
-      "notes": "",
+      "notes": "Abritel",
       "id": "mog1exk9anzx3",
-      "createdAt": "2026-04-26T17:23:41.290Z"
+      "createdAt": "2026-04-26T17:23:41.290Z",
+      "updatedAt": "2026-04-26T17:27:40.940Z"
     },
     {
       "property": "pn",
