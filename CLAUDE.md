@@ -1,10 +1,5 @@
 # Conventions du projet Locations
 
-## ⏰ Rappels en cours pour l'utilisateur
-
-- **À faire le 26/04/2026 (demain par rapport au 25/04)** : mettre à jour la **Dropbox** sans faute. À rappeler proactivement à l'utilisateur dès le début de la prochaine session si on est le 26/04 ou après et que ce rappel est encore là.
-- Une fois le rappel honoré (ou périmé), supprimer cette entrée de CLAUDE.md.
-
 ## Versionnage de l'appli
 
 - **Toujours incrémenter de 0.1** à chaque nouvelle version (V2.1 → V2.2 → V2.3 → V2.4...).
