@@ -389,9 +389,10 @@
       "persons": 5,
       "amount": 0,
       "cleaning": "",
-      "notes": "",
+      "notes": "Abritel",
       "id": "mog1hut9easyy",
-      "createdAt": "2026-04-26T17:25:57.693Z"
+      "createdAt": "2026-04-26T17:25:57.693Z",
+      "updatedAt": "2026-04-26T17:26:56.775Z"
     }
   ],
   "version": 1,
