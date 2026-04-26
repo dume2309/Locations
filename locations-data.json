@@ -53,9 +53,7 @@
       "amount": 0,
       "cleaning": "",
       "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z",
-      "phone": "",
-      "updatedAt": "2026-04-25T20:56:31.330Z"
+      "createdAt": "2026-01-01T00:00:00.000Z"
     },
     {
       "id": "excel_sp_4",
@@ -154,7 +152,7 @@
       "notes": "",
       "createdAt": "2026-01-01T00:00:00.000Z",
       "phone": "",
-      "updatedAt": "2026-04-25T21:03:51.891Z"
+      "updatedAt": "2026-04-07T07:32:18.157Z"
     },
     {
       "id": "excel_sp_11",
@@ -180,9 +178,7 @@
       "amount": 0,
       "cleaning": "",
       "notes": "",
-      "createdAt": "2026-01-01T00:00:00.000Z",
-      "phone": "",
-      "updatedAt": "2026-04-25T21:02:43.697Z"
+      "createdAt": "2026-01-01T00:00:00.000Z"
     },
     {
       "id": "excel_sp_13",
@@ -277,7 +273,7 @@
       "notes": "",
       "createdAt": "2026-01-01T00:00:00.000Z",
       "phone": "",
-      "updatedAt": "2026-04-25T21:03:06.511Z"
+      "updatedAt": "2026-04-07T08:04:26.993Z"
     },
     {
       "property": "pn",
@@ -320,8 +316,7 @@
       "cleaning": "",
       "notes": "",
       "id": "mo6y019v6ebpn",
-      "createdAt": "2026-04-20T08:38:11.829Z",
-      "updatedAt": "2026-04-25T20:56:38.860Z"
+      "createdAt": "2026-04-20T08:38:11.829Z"
     },
     {
       "property": "pn",
