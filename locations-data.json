@@ -364,6 +364,20 @@
       "notes": "",
       "id": "mofwv09waydhk",
       "createdAt": "2026-04-26T15:16:13.221Z"
+    },
+    {
+      "property": "pn",
+      "platform": "AIRBNB",
+      "guestName": "Constant gregoriev",
+      "phone": "",
+      "startDate": "2026-07-23",
+      "endDate": "2026-08-14",
+      "persons": 4,
+      "amount": 0,
+      "cleaning": "",
+      "notes": "",
+      "id": "mog1exk9anzx3",
+      "createdAt": "2026-04-26T17:23:41.290Z"
     }
   ],
   "version": 1,
