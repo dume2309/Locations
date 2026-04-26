@@ -1,4 +1,4 @@
-LOCATIONS — Sauvegarde du 26/04/2026 19:26
+LOCATIONS — Sauvegarde du 26/04/2026 19:27
 
 ═══ SANTU PIETRU ═══
 WiFi : Santo MDP : 654390@B
@@ -57,8 +57,9 @@ Boîte à clés : 3611
    4 pers. — PULSE — Ménage : —
 3. J Rutin — 16/07/2026 → 18/07/2026 (2j)
    4 pers. — AIRBNB — Ménage : —
-4. Constant gregoriev — 23/07/2026 → 14/08/2026 (22j)
+4. Constant gregorie — 23/07/2026 → 14/08/2026 (22j)
    4 pers. — AIRBNB — Ménage : —
+   Notes : Abritel
 5. Marchetti — 14/08/2026 → 15/08/2026 (1j)
    5 pers. — HOMEREZ — Ménage : —
    Notes : Abritel
