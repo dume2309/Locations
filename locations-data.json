@@ -395,6 +395,20 @@
       "id": "mog1hut9easyy",
       "createdAt": "2026-04-26T17:25:57.693Z",
       "updatedAt": "2026-04-26T17:33:28.618Z"
+    },
+    {
+      "property": "pn",
+      "platform": "AIRBNB",
+      "guestName": "Aldo",
+      "phone": "",
+      "startDate": "2026-05-23",
+      "endDate": "2026-05-24",
+      "persons": 3,
+      "amount": 0,
+      "cleaning": "",
+      "notes": "",
+      "id": "mohjh800tuy6b",
+      "createdAt": "2026-04-27T18:37:07.393Z"
     }
   ],
   "version": 1,
