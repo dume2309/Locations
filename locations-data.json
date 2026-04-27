@@ -410,6 +410,20 @@
       "id": "mohjh800tuy6b",
       "createdAt": "2026-04-27T18:37:07.393Z",
       "updatedAt": "2026-04-27T18:37:50.705Z"
+    },
+    {
+      "property": "sp",
+      "platform": "AIRBNB",
+      "guestName": "Johanna",
+      "phone": "",
+      "startDate": "2026-05-03",
+      "endDate": "2026-05-04",
+      "persons": 6,
+      "amount": 0,
+      "cleaning": "",
+      "notes": "",
+      "id": "mohl78nep07xj",
+      "createdAt": "2026-04-27T19:25:20.907Z"
     }
   ],
   "version": 1,
