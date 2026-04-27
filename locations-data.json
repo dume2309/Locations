@@ -401,14 +401,15 @@
       "platform": "AIRBNB",
       "guestName": "Aldo",
       "phone": "",
-      "startDate": "2026-05-23",
-      "endDate": "2026-05-24",
+      "startDate": "2026-05-22",
+      "endDate": "2026-05-23",
       "persons": 3,
       "amount": 0,
       "cleaning": "",
       "notes": "",
       "id": "mohjh800tuy6b",
-      "createdAt": "2026-04-27T18:37:07.393Z"
+      "createdAt": "2026-04-27T18:37:07.393Z",
+      "updatedAt": "2026-04-27T18:37:50.705Z"
     }
   ],
   "version": 1,
