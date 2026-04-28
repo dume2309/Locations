@@ -424,6 +424,20 @@
       "notes": "",
       "id": "mohl78nep07xj",
       "createdAt": "2026-04-27T19:25:20.907Z"
+    },
+    {
+      "property": "pn",
+      "platform": "AIRBNB",
+      "guestName": "Aldo",
+      "phone": "",
+      "startDate": "2026-05-31",
+      "endDate": "2026-06-01",
+      "persons": 3,
+      "amount": 0,
+      "cleaning": "",
+      "notes": "",
+      "id": "moj16vqalqalr",
+      "createdAt": "2026-04-28T19:40:44.195Z"
     }
   ],
   "version": 1,
