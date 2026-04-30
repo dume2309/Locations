@@ -420,10 +420,11 @@
       "endDate": "2026-05-04",
       "persons": 6,
       "amount": 0,
-      "cleaning": "",
+      "cleaning": "Bea / Steph",
       "notes": "",
       "id": "mohl78nep07xj",
-      "createdAt": "2026-04-27T19:25:20.907Z"
+      "createdAt": "2026-04-27T19:25:20.907Z",
+      "updatedAt": "2026-04-30T13:50:57.847Z"
     },
     {
       "property": "pn",
