@@ -1,5 +1,28 @@
 # Conventions du projet Locations
 
+## 🚨 RÈGLE CRITIQUE — GitHub Pages NE DOIT JAMAIS ÊTRE DÉSACTIVÉ
+
+L'appli Locations est servie par **GitHub Pages** depuis le repo `dume2309/Locations`.
+Si GitHub Pages est désactivé, l'appli devient inaccessible (404) sur tous les appareils (iPad, iPhone, PC).
+
+**Vérifications obligatoires :**
+1. **Au début de chaque session de travail sur Locations** : vérifier que Pages est bien actif
+   ```bash
+   gh api repos/dume2309/Locations/pages | grep '"status"'
+   ```
+   Doit retourner `"built"` (ou `"building"` si déploiement en cours).
+   Si erreur 404 ou `has_pages: False` → réactiver immédiatement :
+   ```bash
+   gh api -X POST repos/dume2309/Locations/pages -f source[branch]=master -f source[path]=/
+   ```
+
+2. **Ne JAMAIS** modifier les paramètres GitHub Pages depuis l'interface web sans raison majeure.
+
+3. **Le repo est PUBLIC** par choix de l'utilisateur. Cela permet à GitHub Pages de fonctionner gratuitement.
+   - Conséquence : `locations-data.json` et `locations-backup.txt` sont **publiquement consultables** sur github.com
+   - C'est accepté par l'utilisateur (URLs obscures, faible risque)
+   - Ne JAMAIS repasser en privé sans demander explicitement (Pages cesserait de fonctionner sur le plan gratuit)
+
 ## Versionnage de l'appli
 
 - **Toujours incrémenter de 0.1** à chaque nouvelle version (V2.1 → V2.2 → V2.3 → V2.4...).
