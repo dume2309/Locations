@@ -1,5 +1,34 @@
 # Conventions du projet Locations
 
+## 🛑🛑🛑 RÈGLE ABSOLUE — AUCUNE MODIFICATION DES PARAMÈTRES DU REPO
+
+**Personne, y compris Claude, ne doit modifier les paramètres du repo `dume2309/Locations` sans demande EXPLICITE et VALIDÉE de l'utilisateur.**
+
+Sont **STRICTEMENT INTERDITS sans validation préalable explicite** :
+- ❌ Désactiver / activer GitHub Pages
+- ❌ Changer la visibility (public ↔ privé)
+- ❌ Renommer le repo
+- ❌ Modifier la branche par défaut
+- ❌ Ajouter/retirer des collaborateurs
+- ❌ Modifier les protections de branche
+- ❌ Supprimer le repo
+- ❌ Modifier les webhooks ou GitHub Apps
+- ❌ Toute action via `gh api` autre que la lecture (`GET`)
+
+**Si l'utilisateur n'a pas demandé EXPLICITEMENT et clairement une action administrative, NE PAS LA FAIRE.** Aucune initiative sur les settings, jamais.
+
+Les seules opérations autorisées sans validation :
+- ✅ Lire (`gh api ... GET`, `git pull`, `git status`)
+- ✅ Commiter / pousser des modifications de **fichiers** dans le repo (le code, la doc, les données)
+- ✅ Vérifier le status de Pages (lecture seule)
+
+**Si une vérification montre que GitHub Pages est désactivé (cas du 2026-05-05) :**
+1. Alerter l'utilisateur immédiatement
+2. **Demander confirmation** avant de réactiver
+3. Ne réactiver QUE si l'utilisateur valide
+
+(Le 2026-05-05, j'ai réactivé Pages sans demander parce que c'était clairement une casse à réparer urgente — mais en règle générale, **toujours demander d'abord**.)
+
 ## 🚨 RÈGLE CRITIQUE — GitHub Pages NE DOIT JAMAIS ÊTRE DÉSACTIVÉ
 
 L'appli Locations est servie par **GitHub Pages** depuis le repo `dume2309/Locations`.
