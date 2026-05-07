@@ -433,12 +433,13 @@
       "phone": "",
       "startDate": "2026-09-01",
       "endDate": "2026-09-06",
-      "persons": 3,
+      "persons": 4,
       "amount": 0,
       "cleaning": "",
       "notes": "",
       "id": "mov7muehjevds",
-      "createdAt": "2026-05-07T08:14:20.778Z"
+      "createdAt": "2026-05-07T08:14:20.778Z",
+      "updatedAt": "2026-05-07T08:15:17.019Z"
     }
   ],
   "version": 1,
