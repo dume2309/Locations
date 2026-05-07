@@ -425,21 +425,6 @@
       "notes": "",
       "id": "moj16vqalqalr",
       "createdAt": "2026-04-28T19:40:44.195Z"
-    },
-    {
-      "property": "pn",
-      "platform": "PULSE",
-      "guestName": "G Mancini",
-      "phone": "",
-      "startDate": "2026-09-01",
-      "endDate": "2026-09-06",
-      "persons": 4,
-      "amount": 0,
-      "cleaning": "",
-      "notes": "",
-      "id": "mov7muehjevds",
-      "createdAt": "2026-05-07T08:14:20.778Z",
-      "updatedAt": "2026-05-07T08:15:17.019Z"
     }
   ],
   "version": 1,
@@ -447,7 +432,8 @@
     "mnu7aapk0k8gy",
     "excel_pn_21",
     "excel_pn_20",
-    "mocr9wznqlk90"
+    "mocr9wznqlk90",
+    "mov7muehjevds"
   ],
   "contacts": {
     "laetitia": {
