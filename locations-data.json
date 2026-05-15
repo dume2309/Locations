@@ -425,6 +425,20 @@
       "notes": "",
       "id": "moj16vqalqalr",
       "createdAt": "2026-04-28T19:40:44.195Z"
+    },
+    {
+      "property": "pn",
+      "platform": "AIRBNB",
+      "guestName": "Camilla",
+      "phone": "",
+      "startDate": "2026-08-28",
+      "endDate": "2026-08-30",
+      "persons": 6,
+      "amount": 0,
+      "cleaning": "",
+      "notes": "",
+      "id": "mp6q4wbm8iy81",
+      "createdAt": "2026-05-15T09:37:44.100Z"
     }
   ],
   "version": 1,
